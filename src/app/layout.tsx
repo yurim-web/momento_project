@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Momento',
-  description: 'A blog to record our special moments',
+  title: 'Momento — 우리의 순간',
+  description: '커플이 함께 쓰는 특별한 순간들의 기록',
 }
 
 export default function RootLayout({
@@ -13,7 +13,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
+      <body className="bg-cream-50 min-h-screen">
         {children}
       </body>
     </html>
