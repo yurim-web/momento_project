@@ -12,9 +12,8 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  success: boolean;
+  status: string;
   message: string;
-  user?: User;
 }
 
 export interface SignupRequest {
@@ -25,9 +24,8 @@ export interface SignupRequest {
 }
 
 export interface SignupResponse {
-  success: boolean;
+  status: string;
   message: string;
-  user?: User;
 }
 
 export interface CheckEmailResponse {
