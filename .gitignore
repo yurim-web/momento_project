@@ -51,3 +51,6 @@ out/
 # Production
 build/
 dist/
+
+# Claude
+.claude/
