@@ -11,7 +11,6 @@ export function useAuth(redirectTo = '/login') {
   useEffect(() => {
     const email = localStorage.getItem('userEmail')
     if (!email) {
-      alert('로그인이 필요합니다.')
       router.push(redirectTo)
     } else {
       setIsLoggedIn(true)
