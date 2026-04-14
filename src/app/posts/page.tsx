@@ -43,7 +43,7 @@ export default function PostsPage() {
       <main className="max-w-4xl mx-auto px-4 py-8 pb-24 md:pb-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="font-handwriting text-3xl text-gray-600">우리의 이야기</h1>
-          <Link href="/posts/new" className="btn-primary !w-auto px-5 py-2 text-sm">
+          <Link href="/posts/new" className="btn-primary !w-auto px-5 py-2 text-sm font-ui">
             글쓰기
           </Link>
         </div>
@@ -53,7 +53,7 @@ export default function PostsPage() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-all ${
+              className={`px-4 py-1.5 rounded-full text-sm font-ui whitespace-nowrap transition-all ${
                 selectedCategory === cat
                   ? 'bg-pink-300 text-white'
                   : 'bg-white text-gray-400 border border-pink-100 hover:border-pink-300'
@@ -65,7 +65,7 @@ export default function PostsPage() {
         </div>
 
         {loading ? (
-          <p className="text-center text-gray-400 py-8">불러오는 중...</p>
+          <p className="text-center text-gray-400 py-8 font-ui">불러오는 중...</p>
         ) : posts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-3xl mb-2">✏️</p>

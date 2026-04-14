@@ -138,7 +138,7 @@ export default function CalendarPage() {
             {days.map((day, i) => (
               <div
                 key={day}
-                className={`text-center text-xs py-1 ${
+                className={`text-center text-xs py-1 font-ui ${
                   i === 0 ? 'text-red-300' : i === 6 ? 'text-blue-300' : 'text-gray-400'
                 }`}
               >
@@ -152,7 +152,7 @@ export default function CalendarPage() {
             {/* 이전 달 날짜 */}
             {Array.from({ length: firstDay }, (_, i) => (
               <div key={`prev-${i}`} className="aspect-square p-1 text-center">
-                <span className="text-xs text-gray-300">{prevDays - firstDay + i + 1}</span>
+                <span className="text-xs text-gray-300 font-ui">{prevDays - firstDay + i + 1}</span>
               </div>
             ))}
 
@@ -178,7 +178,7 @@ export default function CalendarPage() {
                   }`}
                 >
                   <span
-                    className={`text-xs ${
+                    className={`text-xs font-ui ${
                       isToday
                         ? 'text-pink-500 font-bold'
                         : dayOfWeek === 0
@@ -221,7 +221,7 @@ export default function CalendarPage() {
                 key === 'schedule' ? 'bg-mint-300' :
                 'bg-peach-300'
               }`} />
-              <span className="text-xs text-gray-400">{label}</span>
+              <span className="text-xs text-gray-400 font-ui">{label}</span>
             </div>
           ))}
         </div>
@@ -235,22 +235,22 @@ export default function CalendarPage() {
               </h3>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="text-sm text-pink-400 hover:text-pink-500 px-3 py-1 border border-pink-200 rounded-full"
+                className="text-sm text-pink-400 hover:text-pink-500 px-3 py-1 border border-pink-200 rounded-full font-ui"
               >
                 + 일정 추가
               </button>
             </div>
 
             {selectedEvents.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-4">일정이 없어요</p>
+              <p className="text-sm text-gray-400 text-center py-4 font-ui">일정이 없어요</p>
             ) : (
               <div className="space-y-2">
                 {selectedEvents.map((ev) => (
                   <div key={ev.id} className="flex items-center gap-3 p-3 rounded-xl bg-cream-50">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${categoryColors[ev.category]}`}>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-ui ${categoryColors[ev.category]}`}>
                       {categoryLabels[ev.category]}
                     </span>
-                    <span className="text-sm text-gray-600">{ev.title}</span>
+                    <span className="text-sm text-gray-600 font-ui">{ev.title}</span>
                   </div>
                 ))}
               </div>
@@ -265,7 +265,7 @@ export default function CalendarPage() {
               <h3 className="font-handwriting text-xl text-gray-600 mb-4">일정 추가</h3>
               <form onSubmit={handleAddEvent} className="space-y-4">
                 <div>
-                  <label className="block text-sm text-pink-400 mb-1.5 ml-1">일정 이름</label>
+                  <label className="block text-sm text-pink-400 mb-1.5 ml-1 font-ui">일정 이름</label>
                   <input
                     type="text"
                     className="input-pastel"
@@ -276,14 +276,14 @@ export default function CalendarPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-pink-400 mb-2 ml-1">카테고리</label>
+                  <label className="block text-sm text-pink-400 mb-2 ml-1 font-ui">카테고리</label>
                   <div className="flex flex-wrap gap-2">
                     {(Object.entries(categoryLabels) as [CalendarEvent['category'], string][]).map(([key, label]) => (
                       <button
                         key={key}
                         type="button"
                         onClick={() => setNewEvent({ ...newEvent, category: key })}
-                        className={`px-3 py-1 rounded-full text-sm transition-all ${
+                        className={`px-3 py-1 rounded-full text-sm font-ui transition-all ${
                           newEvent.category === key
                             ? categoryColors[key]
                             : 'bg-gray-50 text-gray-400 border border-gray-200'

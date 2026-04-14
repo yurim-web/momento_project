@@ -43,9 +43,10 @@ export default function NewPostPage() {
     }
   }
 
-  if (authLoading || !isLoggedIn) {
-    return <div className="min-h-screen bg-cream-50"><Navbar /><p className="text-center py-12 text-gray-400">로딩 중...</p></div>
+  if (authLoading) {
+    return <div className="min-h-screen bg-cream-50"><Navbar /><p className="text-center py-12 text-gray-400 font-ui">로딩 중...</p></div>
   }
+  if (!isLoggedIn) return null
 
   return (
     <div className="min-h-screen bg-cream-50">
