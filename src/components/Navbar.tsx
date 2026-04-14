@@ -10,6 +10,7 @@ const navItems = [
   { href: '/diary', label: '일기장', icon: '📖' },
   { href: '/calendar', label: '캘린더', icon: '📅' },
   { href: '/gallery', label: '갤러리', icon: '🖼' },
+  { href: '/chat', label: '채팅', icon: '💬' },
   { href: '/profile', label: '프로필', icon: '♡' },
 ]
 
