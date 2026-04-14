@@ -12,6 +12,14 @@ export default function ProfilePage() {
   const [editingMessage, setEditingMessage] = useState(false)
   const [person1, setPerson1] = useState({ name: '나', email: '' })
   const [person2, setPerson2] = useState({ name: '당신', email: '' })
+  const [toast, setToast] = useState<string | null>(null)
+  const [showThemeModal, setShowThemeModal] = useState(false)
+  const [showNotifModal, setShowNotifModal] = useState(false)
+  const [notifSettings, setNotifSettings] = useState({
+    anniversary: true,
+    schedule: true,
+    diary: false,
+  })
 
   useEffect(() => {
     const savedStartDate = localStorage.getItem('coupleStartDate')
@@ -20,9 +28,11 @@ export default function ProfilePage() {
     const userName = localStorage.getItem('userName') || '나'
     const partnerName = localStorage.getItem('partnerName') || '당신'
     const partnerEmail = localStorage.getItem('partnerEmail') || ''
+    const savedNotif = localStorage.getItem('notifSettings')
 
     if (savedStartDate) setStartDate(savedStartDate)
     if (savedMessage) setTodayMessage(savedMessage)
+    if (savedNotif) setNotifSettings(JSON.parse(savedNotif))
     setPerson1({ name: userName, email: userEmail })
     setPerson2({ name: partnerName, email: partnerEmail })
   }, [])
@@ -48,6 +58,32 @@ export default function ProfilePage() {
     localStorage.removeItem('userEmail')
     localStorage.removeItem('userName')
     router.push('/login')
+  }
+
+  const showToast = (msg: string) => {
+    setToast(msg)
+    setTimeout(() => setToast(null), 2000)
+  }
+
+  const handleSaveNotif = () => {
+    localStorage.setItem('notifSettings', JSON.stringify(notifSettings))
+    setShowNotifModal(false)
+    showToast('알림 설정이 저장되었어요')
+  }
+
+  const handleExportData = () => {
+    const data = {
+      profile: { person1, person2, startDate, todayMessage },
+      exportedAt: new Date().toISOString(),
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `momento-backup-${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    showToast('데이터가 다운로드되었어요')
   }
 
   return (
@@ -146,22 +182,36 @@ export default function ProfilePage() {
 
         {/* 설정 메뉴 */}
         <div className="card-pastel divide-y divide-pink-50">
-          {[
-            { label: '알림 설정', desc: '기념일, 일정 알림', icon: '🔔' },
-            { label: '테마 변경', desc: '색상 테마 선택', icon: '🎨' },
-            { label: '데이터 내보내기', desc: '일기, 게시글 백업', icon: '💾' },
-          ].map((item) => (
-            <button
-              key={item.label}
-              className="w-full p-4 flex items-center gap-4 hover:bg-pink-50/50 transition-colors text-left"
-            >
-              <span className="text-xl">{item.icon}</span>
-              <div>
-                <p className="font-ui text-sm text-gray-600">{item.label}</p>
-                <p className="font-ui text-xs text-gray-400">{item.desc}</p>
-              </div>
-            </button>
-          ))}
+          <button
+            onClick={() => setShowNotifModal(true)}
+            className="w-full p-4 flex items-center gap-4 hover:bg-pink-50/50 transition-colors text-left"
+          >
+            <span className="text-xl">🔔</span>
+            <div>
+              <p className="font-ui text-sm text-gray-600">알림 설정</p>
+              <p className="font-ui text-xs text-gray-400">기념일, 일정 알림</p>
+            </div>
+          </button>
+          <button
+            onClick={() => setShowThemeModal(true)}
+            className="w-full p-4 flex items-center gap-4 hover:bg-pink-50/50 transition-colors text-left"
+          >
+            <span className="text-xl">🎨</span>
+            <div>
+              <p className="font-ui text-sm text-gray-600">테마 변경</p>
+              <p className="font-ui text-xs text-gray-400">색상 테마 선택</p>
+            </div>
+          </button>
+          <button
+            onClick={handleExportData}
+            className="w-full p-4 flex items-center gap-4 hover:bg-pink-50/50 transition-colors text-left"
+          >
+            <span className="text-xl">💾</span>
+            <div>
+              <p className="font-ui text-sm text-gray-600">데이터 내보내기</p>
+              <p className="font-ui text-xs text-gray-400">일기, 게시글 백업</p>
+            </div>
+          </button>
         </div>
 
         {/* 로그아웃 */}
@@ -172,6 +222,80 @@ export default function ProfilePage() {
           로그아웃
         </button>
       </main>
+
+      {/* 알림 설정 모달 */}
+      {showNotifModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4" onClick={() => setShowNotifModal(false)}>
+          <div className="card-pastel p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-handwriting text-xl text-gray-600 mb-4">알림 설정</h3>
+            <div className="space-y-3">
+              {([
+                { key: 'anniversary' as const, label: '기념일 알림', desc: 'D-day 알림' },
+                { key: 'schedule' as const, label: '일정 알림', desc: '캘린더 일정 알림' },
+                { key: 'diary' as const, label: '일기 알림', desc: '매일 일기 쓰기 리마인더' },
+              ]).map((item) => (
+                <div key={item.key} className="flex items-center justify-between p-3 bg-cream-50 rounded-xl">
+                  <div>
+                    <p className="font-ui text-sm text-gray-600">{item.label}</p>
+                    <p className="font-ui text-xs text-gray-400">{item.desc}</p>
+                  </div>
+                  <button
+                    onClick={() => setNotifSettings({ ...notifSettings, [item.key]: !notifSettings[item.key] })}
+                    className={`w-12 h-6 rounded-full transition-all relative ${notifSettings[item.key] ? 'bg-pink-300' : 'bg-gray-300'}`}
+                  >
+                    <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${notifSettings[item.key] ? 'left-6' : 'left-0.5'}`} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-3 mt-5">
+              <button onClick={() => setShowNotifModal(false)} className="btn-secondary">취소</button>
+              <button onClick={handleSaveNotif} className="btn-primary">저장</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 테마 변경 모달 */}
+      {showThemeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4" onClick={() => setShowThemeModal(false)}>
+          <div className="card-pastel p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-handwriting text-xl text-gray-600 mb-4">테마 변경</h3>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { name: '벚꽃', colors: ['#f8b4c0', '#fbd5dc', '#fef7f7'], active: true },
+                { name: '라벤더', colors: ['#b8a9d4', '#d4c8e8', '#f0ecf7'], active: false },
+                { name: '민트', colors: ['#8ecfc0', '#b8e0d5', '#ecf7f3'], active: false },
+                { name: '피치', colors: ['#f5c0a0', '#f8d8c0', '#fef3eb'], active: false },
+                { name: '하늘', colors: ['#8ec2ff', '#b8d8ff', '#ecf3ff'], active: false },
+                { name: '레몬', colors: ['#f5e6a0', '#f8edc0', '#fefaeb'], active: false },
+              ].map((theme) => (
+                <button
+                  key={theme.name}
+                  onClick={() => { setShowThemeModal(false); showToast(theme.active ? '현재 적용 중인 테마예요' : `${theme.name} 테마는 준비 중이에요`) }}
+                  className={`p-3 rounded-2xl border-2 transition-all ${theme.active ? 'border-pink-300 bg-pink-50' : 'border-gray-100 hover:border-pink-200'}`}
+                >
+                  <div className="flex gap-1 mb-2 justify-center">
+                    {theme.colors.map((c, i) => (
+                      <span key={i} className="w-4 h-4 rounded-full" style={{ backgroundColor: c }} />
+                    ))}
+                  </div>
+                  <p className="font-ui text-xs text-gray-500">{theme.name}</p>
+                  {theme.active && <p className="font-ui text-xs text-pink-400 mt-0.5">적용 중</p>}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setShowThemeModal(false)} className="btn-secondary mt-4">닫기</button>
+          </div>
+        </div>
+      )}
+
+      {/* 토스트 메시지 */}
+      {toast && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-gray-700 text-white text-sm px-5 py-2.5 rounded-full shadow-lg font-ui animate-fade-in">
+          {toast}
+        </div>
+      )}
     </div>
   )
 }
