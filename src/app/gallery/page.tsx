@@ -84,7 +84,7 @@ export default function GalleryPage() {
           <h1 className="font-handwriting text-3xl text-gray-600">갤러리</h1>
           <button
             onClick={() => setShowUpload(true)}
-            className="text-sm text-pink-400 hover:text-pink-500 px-3 py-1.5 border border-pink-200 rounded-full"
+            className="font-ui text-sm text-pink-400 hover:text-pink-500 px-3 py-1.5 border border-pink-200 rounded-full"
           >
             + 사진 추가
           </button>
@@ -92,7 +92,7 @@ export default function GalleryPage() {
 
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-gray-400 text-sm">불러오는 중...</p>
+            <p className="font-ui text-gray-400 text-sm">불러오는 중...</p>
           </div>
         ) : photos.length > 0 ? (
           <div className="grid grid-cols-3 gap-2 md:gap-3">
@@ -109,8 +109,8 @@ export default function GalleryPage() {
                 />
                 <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
                   <div className="text-left">
-                    <p className="text-white text-xs font-bold">{photo.caption}</p>
-                    <p className="text-white/70 text-xs">{formatDate(photo.createdAt)}</p>
+                    <p className="font-ui text-white text-xs font-bold">{photo.caption}</p>
+                    <p className="font-ui text-white/70 text-xs">{formatDate(photo.createdAt)}</p>
                   </div>
                 </div>
               </button>
@@ -119,8 +119,8 @@ export default function GalleryPage() {
         ) : (
           <div className="card-pastel p-12 text-center">
             <span className="text-5xl block mb-4">📷</span>
-            <p className="text-gray-400 text-sm mb-3">아직 사진이 없어요</p>
-            <button onClick={() => setShowUpload(true)} className="text-sm text-pink-400 hover:text-pink-500">
+            <p className="font-ui text-gray-400 text-sm mb-3">아직 사진이 없어요</p>
+            <button onClick={() => setShowUpload(true)} className="font-ui text-sm text-pink-400 hover:text-pink-500">
               첫 번째 사진 올리기 →
             </button>
           </div>
@@ -141,7 +141,7 @@ export default function GalleryPage() {
               {selectedPhoto.caption && (
                 <h3 className="font-handwriting text-xl text-gray-600 mb-1">{selectedPhoto.caption}</h3>
               )}
-              <p className="text-sm text-gray-400 mb-4">{formatDate(selectedPhoto.createdAt)}</p>
+              <p className="font-ui text-sm text-gray-400 mb-4">{formatDate(selectedPhoto.createdAt)}</p>
               <div className="flex gap-3">
                 <button onClick={() => setSelectedPhoto(null)} className="btn-secondary text-sm">
                   닫기
@@ -174,7 +174,7 @@ export default function GalleryPage() {
                   className="w-full border-2 border-dashed border-pink-200 rounded-2xl p-8 text-center hover:border-pink-300 transition-colors mb-4"
                 >
                   <p className="text-3xl mb-2">📷</p>
-                  <p className="text-sm text-gray-400">클릭해서 사진 선택</p>
+                  <p className="font-ui text-sm text-gray-400">클릭해서 사진 선택</p>
                 </button>
               )}
 
@@ -189,14 +189,14 @@ export default function GalleryPage() {
               {previewUrl && (
                 <button
                   onClick={() => { setPreviewUrl(null); setSelectedFile(null); fileRef.current?.click(); }}
-                  className="text-xs text-pink-400 mb-3 block"
+                  className="font-ui text-xs text-pink-400 mb-3 block"
                 >
                   다른 사진 선택
                 </button>
               )}
 
               <div className="mb-4">
-                <label className="block text-sm text-pink-400 mb-1.5 ml-1">한 줄 설명</label>
+                <label className="font-ui block text-sm text-pink-400 mb-1.5 ml-1">한 줄 설명</label>
                 <input
                   type="text"
                   className="input-pastel"
