@@ -4,11 +4,13 @@ import Navbar from '@/components/Navbar'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { postApi } from '@/lib/api'
+import { useAuth } from '@/lib/useAuth'
 
 const categories = ['데이트', '여행', '기념일', '일상', '맛집']
 
 export default function NewPostPage() {
   const router = useRouter()
+  const { isLoggedIn, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
     title: '',
@@ -39,6 +41,10 @@ export default function NewPostPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (authLoading || !isLoggedIn) {
+    return <div className="min-h-screen bg-cream-50"><Navbar /><p className="text-center py-12 text-gray-400">로딩 중...</p></div>
   }
 
   return (

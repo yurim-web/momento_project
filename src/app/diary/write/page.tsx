@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { diaryApi } from '@/lib/api'
+import { useAuth } from '@/lib/useAuth'
 
 const moods = [
   { emoji: '😊', label: '좋아' },
@@ -18,6 +19,7 @@ const moods = [
 
 export default function DiaryWritePage() {
   const router = useRouter()
+  const { isLoggedIn, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
     mood: '',
@@ -48,6 +50,10 @@ export default function DiaryWritePage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (authLoading || !isLoggedIn) {
+    return <div className="min-h-screen bg-cream-50"><Navbar /><p className="text-center py-12 text-gray-400">로딩 중...</p></div>
   }
 
   return (
