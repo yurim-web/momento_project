@@ -24,7 +24,7 @@ export default function PostsPage() {
         : await postApi.getAll(selectedCategory)
       setPosts(data)
     } catch {
-      console.error('게시글을 불러올 수 없습니다.')
+      setPosts([])
     } finally {
       setLoading(false)
     }

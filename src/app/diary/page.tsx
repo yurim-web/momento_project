@@ -23,7 +23,7 @@ export default function DiaryPage() {
         : await diaryApi.getAll()
       setDiaries(data)
     } catch {
-      console.error('일기를 불러올 수 없습니다.')
+      setDiaries([])
     } finally {
       setLoading(false)
     }
