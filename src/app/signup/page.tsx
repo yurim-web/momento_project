@@ -60,7 +60,7 @@ export default function SignupPage() {
         {/* 로고 */}
         <div className="text-center mb-8">
           <h1 className="font-handwriting text-5xl text-pink-400 mb-2">Momento</h1>
-          <p className="text-sm text-pink-300">우리의 특별한 순간들</p>
+          <p className="font-handwriting text-lg text-pink-300">우리의 특별한 순간들</p>
         </div>
 
         {/* 회원가입 카드 */}

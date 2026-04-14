@@ -43,7 +43,7 @@ export default function LoginPage() {
         {/* 로고 */}
         <div className="text-center mb-8">
           <h1 className="font-handwriting text-5xl text-pink-400 mb-2">Momento</h1>
-          <p className="text-sm text-pink-300">우리의 특별한 순간들</p>
+          <p className="font-handwriting text-lg text-pink-300">우리의 특별한 순간들</p>
         </div>
 
         {/* 로그인 카드 */}
@@ -53,14 +53,14 @@ export default function LoginPage() {
           </h2>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-400 text-center">
+            <div className="font-ui mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-400 text-center">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm text-pink-400 mb-1.5 ml-1">이메일</label>
+              <label className="font-ui block text-sm text-pink-400 mb-1.5 ml-1">이메일</label>
               <input
                 type="email"
                 className="input-pastel"
@@ -72,7 +72,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-sm text-pink-400 mb-1.5 ml-1">비밀번호</label>
+              <label className="font-ui block text-sm text-pink-400 mb-1.5 ml-1">비밀번호</label>
               <input
                 type="password"
                 className="input-pastel"
@@ -91,7 +91,7 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-400">
+            <p className="font-ui text-sm text-gray-400">
               아직 계정이 없나요?{' '}
               <Link href="/signup" className="text-pink-400 hover:text-pink-500 font-bold">
                 회원가입
@@ -100,10 +100,10 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* 하단 장식 */}
-        <p className="text-center mt-6 font-handwriting text-lg text-lavender-300">
-          둘만의 이야기를 시작해요
-        </p>
+        {/* 하단 장식 → 가이드 링크 */}
+        <Link href="/guide" className="block text-center mt-6 font-handwriting text-lg text-lavender-300 hover:text-lavender-400 transition-colors">
+          둘만의 이야기를 시작해요 →
+        </Link>
       </div>
     </div>
   )
