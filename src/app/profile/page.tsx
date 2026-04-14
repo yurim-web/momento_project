@@ -66,8 +66,8 @@ export default function ProfilePage() {
                   {person1.name[0]}
                 </span>
               </div>
-              <span className="text-sm text-gray-600 font-bold">{person1.name}</span>
-              <span className="text-xs text-gray-400">{person1.email}</span>
+              <span className="font-ui text-sm text-gray-600 font-bold">{person1.name}</span>
+              <span className="font-ui text-xs text-gray-400">{person1.email}</span>
             </div>
 
             <div className="flex flex-col items-center">
@@ -81,14 +81,14 @@ export default function ProfilePage() {
                   {person2.name[0]}
                 </span>
               </div>
-              <span className="text-sm text-gray-600 font-bold">{person2.name}</span>
-              <span className="text-xs text-gray-400">{person2.email}</span>
+              <span className="font-ui text-sm text-gray-600 font-bold">{person2.name}</span>
+              <span className="font-ui text-xs text-gray-400">{person2.email}</span>
             </div>
           </div>
 
           {/* 사귄 날짜 */}
           <div className="bg-cream-50 rounded-2xl p-4 mb-4">
-            <p className="text-xs text-gray-400 mb-1">사귄 날</p>
+            <p className="font-ui text-xs text-gray-400 mb-1">사귄 날</p>
             {isEditing ? (
               <div className="flex items-center gap-2 justify-center">
                 <input
@@ -97,17 +97,17 @@ export default function ProfilePage() {
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
-                <button onClick={handleSaveDate} className="text-sm text-pink-400 hover:text-pink-500">
+                <button onClick={handleSaveDate} className="font-ui text-sm text-pink-400 hover:text-pink-500">
                   저장
                 </button>
-                <button onClick={() => setIsEditing(false)} className="text-sm text-gray-400">
+                <button onClick={() => setIsEditing(false)} className="font-ui text-sm text-gray-400">
                   취소
                 </button>
               </div>
             ) : (
               <button
                 onClick={() => setIsEditing(true)}
-                className="text-sm text-gray-600 hover:text-pink-400 transition-colors"
+                className="font-ui text-sm text-gray-600 hover:text-pink-400 transition-colors"
               >
                 {startDate} ✎
               </button>
@@ -116,7 +116,7 @@ export default function ProfilePage() {
 
           {/* 오늘의 한마디 */}
           <div className="bg-gradient-to-r from-pink-50 to-lavender-50 rounded-2xl p-4">
-            <p className="text-xs text-lavender-400 mb-1">오늘의 한마디</p>
+            <p className="font-ui text-xs text-lavender-400 mb-1">오늘의 한마디</p>
             {editingMessage ? (
               <div className="flex items-center gap-2 justify-center">
                 <input
@@ -126,10 +126,10 @@ export default function ProfilePage() {
                   onChange={(e) => setTodayMessage(e.target.value)}
                   placeholder="한마디를 남겨주세요"
                 />
-                <button onClick={handleSaveMessage} className="text-sm text-pink-400 hover:text-pink-500">
+                <button onClick={handleSaveMessage} className="font-ui text-sm text-pink-400 hover:text-pink-500">
                   저장
                 </button>
-                <button onClick={() => setEditingMessage(false)} className="text-sm text-gray-400">
+                <button onClick={() => setEditingMessage(false)} className="font-ui text-sm text-gray-400">
                   취소
                 </button>
               </div>
@@ -157,8 +157,8 @@ export default function ProfilePage() {
             >
               <span className="text-xl">{item.icon}</span>
               <div>
-                <p className="text-sm text-gray-600">{item.label}</p>
-                <p className="text-xs text-gray-400">{item.desc}</p>
+                <p className="font-ui text-sm text-gray-600">{item.label}</p>
+                <p className="font-ui text-xs text-gray-400">{item.desc}</p>
               </div>
             </button>
           ))}
@@ -167,7 +167,7 @@ export default function ProfilePage() {
         {/* 로그아웃 */}
         <button
           onClick={handleLogout}
-          className="w-full mt-4 p-3 text-center text-sm text-red-300 hover:text-red-400 transition-colors"
+          className="font-ui w-full mt-4 p-3 text-center text-sm text-red-300 hover:text-red-400 transition-colors"
         >
           로그아웃
         </button>
