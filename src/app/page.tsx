@@ -21,15 +21,15 @@ export default function Home() {
     // localStorage에서 커플 설정 불러오기
     const savedStartDate = localStorage.getItem('coupleStartDate')
     const savedPerson1 = localStorage.getItem('userName') || '나'
+    const savedPerson2 = localStorage.getItem('partnerName') || '당신'
     const savedMessage = localStorage.getItem('todayMessage')
-    if (savedStartDate || savedMessage) {
-      setCoupleData(prev => ({
-        ...prev,
-        person1: savedPerson1,
-        startDate: savedStartDate || prev.startDate,
-        todayMessage: savedMessage || prev.todayMessage,
-      }))
-    }
+    setCoupleData(prev => ({
+      ...prev,
+      person1: savedPerson1,
+      person2: savedPerson2,
+      startDate: savedStartDate || prev.startDate,
+      todayMessage: savedMessage || prev.todayMessage,
+    }))
 
     // 최근 게시글 API에서 불러오기
     const fetchRecentPosts = async () => {
@@ -65,21 +65,23 @@ export default function Home() {
 
       <main className="max-w-4xl mx-auto px-4 py-8 pb-24 md:pb-8">
         {/* D+Day 섹션 */}
-        <section className="card-pastel p-8 text-center mb-8">
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center">
-              <span className="font-handwriting text-xl text-pink-400">{coupleData.person1}</span>
+        <Link href="/anniversary" className="block">
+          <section className="card-pastel p-8 text-center mb-8 hover:scale-[1.01] transition-transform">
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center">
+                <span className="font-handwriting text-xl text-pink-400">{coupleData.person1}</span>
+              </div>
+              <span className="font-handwriting text-3xl text-pink-300">♥</span>
+              <div className="w-16 h-16 rounded-full bg-lavender-100 flex items-center justify-center">
+                <span className="font-handwriting text-xl text-lavender-400">{coupleData.person2}</span>
+              </div>
             </div>
-            <span className="font-handwriting text-3xl text-pink-300">♥</span>
-            <div className="w-16 h-16 rounded-full bg-lavender-100 flex items-center justify-center">
-              <span className="font-handwriting text-xl text-lavender-400">{coupleData.person2}</span>
-            </div>
-          </div>
-          <p className="font-handwriting text-4xl text-pink-400 mb-1">
-            D+{getDDay()}
-          </p>
-          <p className="text-sm text-gray-400 font-ui">{coupleData.startDate} ~</p>
-        </section>
+            <p className="font-handwriting text-4xl text-pink-400 mb-1">
+              D+{getDDay()}
+            </p>
+            <p className="text-sm text-gray-400 font-ui">{coupleData.startDate} ~</p>
+          </section>
+        </Link>
 
         {/* 오늘의 한마디 */}
         <section className="card-pastel p-6 mb-8 bg-gradient-to-r from-pink-50 to-lavender-50">

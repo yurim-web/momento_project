@@ -15,6 +15,9 @@ export default function ProfilePage() {
   const [toast, setToast] = useState<string | null>(null)
   const [showThemeModal, setShowThemeModal] = useState(false)
   const [showNotifModal, setShowNotifModal] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [editName, setEditName] = useState('')
+  const [editPartnerName, setEditPartnerName] = useState('')
   const [notifSettings, setNotifSettings] = useState({
     anniversary: true,
     schedule: true,
@@ -71,6 +74,21 @@ export default function ProfilePage() {
     showToast('알림 설정이 저장되었어요')
   }
 
+  const openProfileModal = () => {
+    setEditName(person1.name)
+    setEditPartnerName(person2.name)
+    setShowProfileModal(true)
+  }
+
+  const handleSaveProfile = () => {
+    localStorage.setItem('userName', editName)
+    localStorage.setItem('partnerName', editPartnerName)
+    setPerson1({ ...person1, name: editName })
+    setPerson2({ ...person2, name: editPartnerName })
+    setShowProfileModal(false)
+    showToast('별명이 변경되었어요')
+  }
+
   const handleExportData = () => {
     const data = {
       profile: { person1, person2, startDate, todayMessage },
@@ -96,30 +114,30 @@ export default function ProfilePage() {
         {/* 커플 프로필 카드 */}
         <div className="card-pastel p-8 text-center mb-6">
           <div className="flex items-center justify-center gap-6 mb-6">
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-20 h-20 rounded-full bg-pink-100 flex items-center justify-center border-2 border-pink-200">
+            <button onClick={openProfileModal} className="flex flex-col items-center gap-2 group">
+              <div className="w-20 h-20 rounded-full bg-pink-100 flex items-center justify-center border-2 border-pink-200 group-hover:border-pink-300 transition-colors">
                 <span className="font-handwriting text-2xl text-pink-400">
                   {person1.name[0]}
                 </span>
               </div>
-              <span className="font-ui text-sm text-gray-600 font-bold">{person1.name}</span>
+              <span className="font-ui text-sm text-gray-600 font-bold group-hover:text-pink-400 transition-colors">{person1.name} ✎</span>
               <span className="font-ui text-xs text-gray-400">{person1.email}</span>
-            </div>
+            </button>
 
             <div className="flex flex-col items-center">
               <span className="text-3xl">♥</span>
               <span className="font-handwriting text-xl text-pink-400 mt-1">D+{getDDay()}</span>
             </div>
 
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-20 h-20 rounded-full bg-lavender-100 flex items-center justify-center border-2 border-lavender-200">
+            <button onClick={openProfileModal} className="flex flex-col items-center gap-2 group">
+              <div className="w-20 h-20 rounded-full bg-lavender-100 flex items-center justify-center border-2 border-lavender-200 group-hover:border-lavender-300 transition-colors">
                 <span className="font-handwriting text-2xl text-lavender-400">
                   {person2.name[0]}
                 </span>
               </div>
-              <span className="font-ui text-sm text-gray-600 font-bold">{person2.name}</span>
+              <span className="font-ui text-sm text-gray-600 font-bold group-hover:text-lavender-400 transition-colors">{person2.name} ✎</span>
               <span className="font-ui text-xs text-gray-400">{person2.email}</span>
-            </div>
+            </button>
           </div>
 
           {/* 사귄 날짜 */}
@@ -222,6 +240,41 @@ export default function ProfilePage() {
           로그아웃
         </button>
       </main>
+
+      {/* 별명 수정 모달 */}
+      {showProfileModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4" onClick={() => setShowProfileModal(false)}>
+          <div className="card-pastel p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-handwriting text-xl text-gray-600 mb-4">별명 변경</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="font-ui block text-sm text-pink-400 mb-1.5 ml-1">내 별명</label>
+                <input
+                  type="text"
+                  className="input-pastel"
+                  placeholder="내 별명을 입력해주세요"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="font-ui block text-sm text-lavender-400 mb-1.5 ml-1">상대방 별명</label>
+                <input
+                  type="text"
+                  className="input-pastel"
+                  placeholder="상대방 별명을 입력해주세요"
+                  value={editPartnerName}
+                  onChange={(e) => setEditPartnerName(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-5">
+              <button onClick={() => setShowProfileModal(false)} className="btn-secondary">취소</button>
+              <button onClick={handleSaveProfile} className="btn-primary" disabled={!editName.trim()}>저장</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 알림 설정 모달 */}
       {showNotifModal && (
