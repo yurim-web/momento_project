@@ -80,7 +80,7 @@ export default function DiaryDetailPage() {
           </div>
 
           <div className="mt-6 pt-4 border-t border-pink-100 flex gap-3">
-            <button className="btn-secondary text-sm">수정하기</button>
+            <Link href={`/diary/${diary.id}/edit`} className="btn-secondary text-sm text-center">수정하기</Link>
             <button onClick={handleDelete} className="btn-secondary text-sm text-red-300 border-red-100 hover:bg-red-50 hover:border-red-200">
               삭제하기
             </button>

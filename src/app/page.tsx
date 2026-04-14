@@ -1,16 +1,50 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
+import { postApi, PostData } from '@/lib/api'
 
 export default function Home() {
-  // TODO: 실제 데이터 연동
-  const coupleData = {
+  const [recentPosts, setRecentPosts] = useState<PostData[]>([])
+  const [loading, setLoading] = useState(true)
+
+  // localStorage에서 커플 데이터 불러오기
+  const [coupleData, setCoupleData] = useState({
     person1: '나',
     person2: '당신',
     startDate: '2024-01-15',
     todayMessage: '오늘도 사랑해 ♡',
-  }
+  })
+
+  useEffect(() => {
+    // localStorage에서 커플 설정 불러오기
+    const savedStartDate = localStorage.getItem('coupleStartDate')
+    const savedPerson1 = localStorage.getItem('userName') || '나'
+    const savedMessage = localStorage.getItem('todayMessage')
+    if (savedStartDate || savedMessage) {
+      setCoupleData(prev => ({
+        ...prev,
+        person1: savedPerson1,
+        startDate: savedStartDate || prev.startDate,
+        todayMessage: savedMessage || prev.todayMessage,
+      }))
+    }
+
+    // 최근 게시글 API에서 불러오기
+    const fetchRecentPosts = async () => {
+      try {
+        const posts = await postApi.getAll()
+        setRecentPosts(posts.slice(0, 5))
+      } catch {
+        // API 연결 실패 시 빈 배열
+        setRecentPosts([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchRecentPosts()
+  }, [])
 
   const getDDay = () => {
     const start = new Date(coupleData.startDate)
@@ -19,11 +53,11 @@ export default function Home() {
     return diff
   }
 
-  const recentPosts = [
-    { id: 1, title: '첫 번째 데이트 이야기', date: '2024.03.15', category: '데이트', author: '나' },
-    { id: 2, title: '벚꽃 구경 다녀왔어요', date: '2024.04.02', category: '일상', author: '당신' },
-    { id: 3, title: '100일 기념 여행', date: '2024.04.24', category: '여행', author: '나' },
-  ]
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return ''
+    const d = new Date(dateStr)
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
+  }
 
   return (
     <div className="min-h-screen bg-cream-50">
@@ -83,24 +117,37 @@ export default function Home() {
             </Link>
           </div>
           <div className="space-y-3">
-            {recentPosts.map((post) => (
-              <Link key={post.id} href={`/posts/${post.id}`} className="block">
-                <div className="card-pastel p-4 hover:scale-[1.01] transition-transform">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-pink-100 text-pink-400 mr-2">
-                        {post.category}
-                      </span>
-                      <span className="text-sm text-gray-600">{post.title}</span>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-gray-400">{post.date}</p>
-                      <p className="text-xs text-lavender-400">{post.author}</p>
+            {loading ? (
+              <div className="card-pastel p-8 text-center">
+                <p className="text-gray-400 text-sm">불러오는 중...</p>
+              </div>
+            ) : recentPosts.length > 0 ? (
+              recentPosts.map((post) => (
+                <Link key={post.id} href={`/posts/${post.id}`} className="block">
+                  <div className="card-pastel p-4 hover:scale-[1.01] transition-transform">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-pink-100 text-pink-400 mr-2">
+                          {post.category}
+                        </span>
+                        <span className="text-sm text-gray-600">{post.title}</span>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-400">{formatDate(post.createdAt)}</p>
+                        <p className="text-xs text-lavender-400">{post.authorName}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))
+            ) : (
+              <div className="card-pastel p-8 text-center">
+                <p className="text-gray-400 text-sm mb-3">아직 작성된 글이 없어요</p>
+                <Link href="/posts/new" className="text-sm text-pink-400 hover:text-pink-500">
+                  첫 번째 이야기 쓰러 가기 →
+                </Link>
+              </div>
+            )}
           </div>
         </section>
       </main>
