@@ -28,7 +28,7 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm transition-colors ${
+                className={`text-sm font-ui transition-colors ${
                   pathname === item.href
                     ? 'text-pink-500 font-bold'
                     : 'text-gray-400 hover:text-pink-400'
@@ -48,7 +48,7 @@ export default function Navbar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 text-xs transition-colors ${
+              className={`flex flex-col items-center gap-0.5 text-xs font-ui transition-colors ${
                 pathname === item.href
                   ? 'text-pink-500'
                   : 'text-gray-400'

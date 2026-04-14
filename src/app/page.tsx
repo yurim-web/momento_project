@@ -78,12 +78,12 @@ export default function Home() {
           <p className="font-handwriting text-4xl text-pink-400 mb-1">
             D+{getDDay()}
           </p>
-          <p className="text-sm text-gray-400">{coupleData.startDate} ~</p>
+          <p className="text-sm text-gray-400 font-ui">{coupleData.startDate} ~</p>
         </section>
 
         {/* 오늘의 한마디 */}
         <section className="card-pastel p-6 mb-8 bg-gradient-to-r from-pink-50 to-lavender-50">
-          <p className="text-xs text-lavender-400 mb-2">오늘의 한마디</p>
+          <p className="text-xs text-lavender-400 mb-2 font-ui">오늘의 한마디</p>
           <p className="font-handwriting text-xl text-gray-600 text-center">
             &ldquo;{coupleData.todayMessage}&rdquo;
           </p>
@@ -103,7 +103,7 @@ export default function Home() {
               className="card-pastel p-4 text-center hover:scale-105 transition-transform"
             >
               <span className="text-2xl block mb-1">{item.icon}</span>
-              <span className="text-xs text-gray-500">{item.label}</span>
+              <span className="text-xs text-gray-500 font-ui">{item.label}</span>
             </Link>
           ))}
         </section>
@@ -112,14 +112,14 @@ export default function Home() {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-handwriting text-2xl text-gray-600">최근 이야기</h2>
-            <Link href="/posts" className="text-sm text-pink-400 hover:text-pink-500">
+            <Link href="/posts" className="text-sm text-pink-400 hover:text-pink-500 font-ui">
               전체보기
             </Link>
           </div>
           <div className="space-y-3">
             {loading ? (
               <div className="card-pastel p-8 text-center">
-                <p className="text-gray-400 text-sm">불러오는 중...</p>
+                <p className="text-gray-400 text-sm font-ui">불러오는 중...</p>
               </div>
             ) : recentPosts.length > 0 ? (
               recentPosts.map((post) => (
