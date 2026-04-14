@@ -159,3 +159,57 @@ export const anniversaryApi = {
   delete: (id: number): Promise<void> =>
     fetchApi(`/api/anniversaries/${id}`, { method: 'DELETE' }),
 };
+
+// ============ Couple API ============
+export interface CoupleLinkData {
+  id?: number;
+  inviteCode: string;
+  ownerEmail: string;
+  partnerEmail?: string;
+  connected: boolean;
+  createdAt?: string;
+  connectedAt?: string;
+}
+
+export const coupleApi = {
+  generateCode: (email: string): Promise<CoupleLinkData> =>
+    fetchApi('/api/couple/generate', { method: 'POST', body: JSON.stringify({ email }) }),
+
+  connect: (inviteCode: string, email: string): Promise<CoupleLinkData> =>
+    fetchApi('/api/couple/connect', { method: 'POST', body: JSON.stringify({ inviteCode, email }) }),
+
+  getStatus: (email: string): Promise<CoupleLinkData & { connected: boolean }> =>
+    fetchApi(`/api/couple/status?email=${encodeURIComponent(email)}`),
+};
+
+// ============ Gallery API ============
+export interface GalleryData {
+  id?: number;
+  fileName: string;
+  originalName: string;
+  imageUrl: string;
+  caption?: string;
+  authorEmail?: string;
+  createdAt?: string;
+}
+
+export const galleryApi = {
+  getAll: (): Promise<GalleryData[]> =>
+    fetchApi('/api/gallery'),
+
+  upload: async (file: File, caption: string, authorEmail: string): Promise<GalleryData> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('caption', caption);
+    formData.append('authorEmail', authorEmail);
+    const response = await fetch(`${API_BASE_URL}/api/gallery/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+    if (!response.ok) throw new Error(`API error: ${response.status}`);
+    return response.json();
+  },
+
+  delete: (id: number): Promise<void> =>
+    fetchApi(`/api/gallery/${id}`, { method: 'DELETE' }),
+};
