@@ -3,22 +3,57 @@
 import { useState, useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
-import { postApi, PostData } from '@/lib/api'
+import { PostData } from '@/lib/api'
+
+interface MemoData {
+  id: string
+  title: string
+  content: string
+  color: 'pink' | 'lavender' | 'mint' | 'yellow'
+  authorName: string
+  createdAt: string
+  pinned?: boolean
+}
+
+interface CalendarEvent {
+  id: number
+  title: string
+  date: string
+  color?: string
+}
+
+const memoColors = {
+  pink:     { bg: 'bg-pink-50',     border: 'border-pink-200',     dot: 'bg-pink-300' },
+  lavender: { bg: 'bg-lavender-50', border: 'border-lavender-200', dot: 'bg-lavender-300' },
+  mint:     { bg: 'bg-mint-50',     border: 'border-mint-200',     dot: 'bg-mint-300' },
+  yellow:   { bg: 'bg-yellow-50',   border: 'border-yellow-200',   dot: 'bg-yellow-300' },
+}
+
+const formatDateTime = (dateStr?: string) => {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+}
+
+const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
 export default function Home() {
   const [recentPosts, setRecentPosts] = useState<PostData[]>([])
   const [loading, setLoading] = useState(true)
+  const [memos, setMemos] = useState<MemoData[]>([])
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([])
+  const [calMonth, setCalMonth] = useState(new Date())
 
-  // localStorage에서 커플 데이터 불러오기
   const [coupleData, setCoupleData] = useState({
     person1: '나',
     person2: '당신',
     startDate: '2024-01-15',
     todayMessage: '오늘도 사랑해 ♡',
   })
+  const [myPhoto, setMyPhoto] = useState<string | null>(null)
+  const [partnerPhoto, setPartnerPhoto] = useState<string | null>(null)
 
   useEffect(() => {
-    // localStorage에서 커플 설정 불러오기
     const savedStartDate = localStorage.getItem('coupleStartDate')
     const savedPerson1 = localStorage.getItem('userName') || '나'
     const savedPerson2 = localStorage.getItem('partnerName') || '당신'
@@ -31,26 +66,26 @@ export default function Home() {
       todayMessage: savedMessage || prev.todayMessage,
     }))
 
-    // 최근 게시글 API에서 불러오기
-    const fetchRecentPosts = async () => {
-      try {
-        const posts = await postApi.getAll()
-        setRecentPosts(posts.slice(0, 5))
-      } catch {
-        // API 연결 실패 시 빈 배열
-        setRecentPosts([])
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchRecentPosts()
+    setMyPhoto(localStorage.getItem('myProfilePhoto'))
+    setPartnerPhoto(localStorage.getItem('partnerProfilePhoto'))
+
+    const posts = JSON.parse(localStorage.getItem('momento_posts') || '[]')
+    setRecentPosts(posts.slice(0, 5))
+
+    const allMemos: MemoData[] = JSON.parse(localStorage.getItem('momento_memos') || '[]')
+    const pinned = allMemos.filter(m => m.pinned)
+    const latest = allMemos.filter(m => !m.pinned)
+    setMemos([...pinned, ...latest].slice(0, 4))
+
+    setCalendarEvents(JSON.parse(localStorage.getItem('momento_calendar') || '[]'))
+
+    setLoading(false)
   }, [])
 
   const getDDay = () => {
     const start = new Date(coupleData.startDate)
     const today = new Date()
-    const diff = Math.floor((today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-    return diff
+    return Math.floor((today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
   }
 
   const formatDate = (dateStr?: string) => {
@@ -59,6 +94,38 @@ export default function Home() {
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
   }
 
+  // ── 미니 캘린더 계산 ──────────────────────────────────────
+  const buildCalendar = () => {
+    const year = calMonth.getFullYear()
+    const month = calMonth.getMonth()
+    const firstDay = new Date(year, month, 1).getDay()
+    const daysInMonth = new Date(year, month + 1, 0).getDate()
+    const cells: (number | null)[] = Array(firstDay).fill(null)
+    for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+    while (cells.length < 42) cells.push(null)
+    return cells
+  }
+
+  const today = new Date()
+  const isToday = (day: number) =>
+    day === today.getDate() &&
+    calMonth.getMonth() === today.getMonth() &&
+    calMonth.getFullYear() === today.getFullYear()
+
+  const eventDaysInMonth = new Set(
+    calendarEvents
+      .filter(e => {
+        const d = new Date(e.date)
+        return d.getFullYear() === calMonth.getFullYear() && d.getMonth() === calMonth.getMonth()
+      })
+      .map(e => new Date(e.date).getDate())
+  )
+
+  const prevMonth = () => setCalMonth(d => new Date(d.getFullYear(), d.getMonth() - 1, 1))
+  const nextMonth = () => setCalMonth(d => new Date(d.getFullYear(), d.getMonth() + 1, 1))
+
+  const cells = buildCalendar()
+
   return (
     <div className="min-h-screen bg-cream-50">
       <Navbar />
@@ -66,44 +133,149 @@ export default function Home() {
       <main className="max-w-4xl mx-auto px-4 py-8 pb-24 md:pb-8">
         {/* D+Day 섹션 */}
         <Link href="/anniversary" className="block">
-          <section className="card-pastel p-8 text-center mb-8 hover:scale-[1.01] transition-transform">
+          <section className="card-pastel p-8 text-center mb-6 hover:scale-[1.01] transition-transform">
             <div className="flex items-center justify-center gap-4 mb-4">
-              <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center">
-                <span className="font-handwriting text-xl text-pink-400">{coupleData.person1}</span>
+              <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center overflow-hidden border-2 border-pink-200">
+                {myPhoto
+                  ? <img src={myPhoto} alt="내 프로필" className="w-full h-full object-cover" />
+                  : <span className="font-handwriting text-xl text-pink-400">{coupleData.person1}</span>}
               </div>
               <span className="font-handwriting text-3xl text-pink-300">♥</span>
-              <div className="w-16 h-16 rounded-full bg-lavender-100 flex items-center justify-center">
-                <span className="font-handwriting text-xl text-lavender-400">{coupleData.person2}</span>
+              <div className="w-16 h-16 rounded-full bg-lavender-100 flex items-center justify-center overflow-hidden border-2 border-lavender-200">
+                {partnerPhoto
+                  ? <img src={partnerPhoto} alt="상대방 프로필" className="w-full h-full object-cover" />
+                  : <span className="font-handwriting text-xl text-lavender-400">{coupleData.person2}</span>}
               </div>
             </div>
-            <p className="font-handwriting text-4xl text-pink-400 mb-1">
-              D+{getDDay()}
-            </p>
+            <p className="font-handwriting text-4xl text-pink-400 mb-1">D+{getDDay()}</p>
             <p className="text-sm text-gray-400 font-ui">{coupleData.startDate} ~</p>
           </section>
         </Link>
 
-        {/* 오늘의 한마디 */}
-        <section className="card-pastel p-6 mb-8 bg-gradient-to-r from-pink-50 to-lavender-50">
-          <p className="text-xs text-lavender-400 mb-2 font-ui">오늘의 한마디</p>
-          <p className="font-handwriting text-xl text-gray-600 text-center">
-            &ldquo;{coupleData.todayMessage}&rdquo;
-          </p>
-        </section>
+        {/* 오늘의 한마디 + 미니 캘린더 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          {/* 왼쪽: 두 박스 */}
+          <div className="flex flex-col gap-4 h-[320px]">
+            {/* 오늘의 한마디 */}
+            <section className="card-pastel p-5 bg-gradient-to-br from-pink-50 to-lavender-50 flex-1 flex flex-col">
+              <p className="font-ui text-sm font-bold text-lavender-400 mb-3">오늘의 한마디 ✨</p>
+              <div className="flex-1 flex items-center justify-center">
+                <p className="font-handwriting text-lg text-gray-600 text-center leading-relaxed">
+                  &ldquo;{coupleData.todayMessage}&rdquo;
+                </p>
+              </div>
+            </section>
+
+            {/* 오늘 일정 */}
+            <section className="card-pastel p-5 flex-1 flex flex-col">
+              <p className="font-ui text-sm font-bold text-pink-400 mb-3">오늘 일정 📅</p>
+              {(() => {
+                const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+                const todayEvents = calendarEvents.filter(e => e.date === todayStr)
+                return todayEvents.length > 0 ? (
+                  <div className="space-y-1.5">
+                    {todayEvents.slice(0, 3).map(e => (
+                      <div key={e.id} className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-pink-300 flex-shrink-0" />
+                        <p className="font-ui text-xs text-gray-500 truncate">{e.title}</p>
+                      </div>
+                    ))}
+                    {todayEvents.length > 3 && (
+                      <p className="font-ui text-xs text-gray-300 ml-3.5">+{todayEvents.length - 3}개 더</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="font-ui text-xs text-gray-300">오늘은 일정이 없어요 🌿</p>
+                )
+              })()}
+            </section>
+          </div>
+
+          {/* 미니 캘린더 */}
+          <Link href="/calendar">
+            <section className="card-pastel p-4 hover:scale-[1.01] transition-transform h-[320px] flex flex-col">
+              {/* 헤더 */}
+              <div className="flex items-center justify-between mb-2">
+                <button onClick={e => { e.preventDefault(); prevMonth() }} className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-pink-400 text-lg">‹</button>
+                <p className="font-ui text-sm font-bold text-gray-500">{calMonth.getFullYear()}년 {calMonth.getMonth() + 1}월</p>
+                <button onClick={e => { e.preventDefault(); nextMonth() }} className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-pink-400 text-lg">›</button>
+              </div>
+
+              {/* 요일 */}
+              <div className="grid grid-cols-7 mb-1">
+                {DAY_LABELS.map((d, i) => (
+                  <div key={d} className={`text-center font-ui text-xs py-1 ${i === 0 ? 'text-red-300' : i === 6 ? 'text-blue-300' : 'text-gray-400'}`}>{d}</div>
+                ))}
+              </div>
+
+              {/* 날짜 그리드 — 항상 6행 고정 */}
+              <div className="grid grid-cols-7 flex-1">
+                {Array.from({ length: 42 }, (_, idx) => {
+                  const day = cells[idx] ?? null
+                  return (
+                    <div key={idx} className="flex flex-col items-center justify-start pt-0.5">
+                      {day !== null ? (
+                        <>
+                          <span className={`font-ui text-xs w-6 h-6 flex items-center justify-center rounded-full
+                            ${isToday(day) ? 'bg-pink-300 text-white font-bold'
+                              : idx % 7 === 0 ? 'text-red-300'
+                              : idx % 7 === 6 ? 'text-blue-300'
+                              : 'text-gray-500'}`}>
+                            {day}
+                          </span>
+                          {eventDaysInMonth.has(day) && <span className="w-1 h-1 rounded-full bg-lavender-300 mt-0.5" />}
+                        </>
+                      ) : <span className="w-6 h-6" />}
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+          </Link>
+        </div>
+
+        {/* 메모 섹션 */}
+        {memos.length > 0 && (
+          <section className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-handwriting text-2xl text-gray-600">메모 🗒️</h2>
+              <Link href="/posts" className="text-sm text-pink-400 hover:text-pink-500 font-ui">더보기</Link>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {memos.map(memo => {
+                const c = memoColors[memo.color] ?? memoColors.pink
+                const commentCount = JSON.parse(localStorage.getItem('momento_memo_comments') || '[]')
+                  .filter((cc: { memoId: string }) => cc.memoId === memo.id).length
+                return (
+                  <Link key={memo.id} href="/posts" className={`rounded-2xl border-2 p-4 ${c.bg} ${c.border} hover:scale-[1.02] transition-transform`}>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <div className={`w-2.5 h-2.5 rounded-full ${c.dot}`} />
+                      {memo.pinned && <span className="text-xs">📌</span>}
+                    </div>
+                    {memo.title && (
+                      <p className="font-ui text-sm font-bold text-gray-600 mb-1.5">{memo.title}</p>
+                    )}
+                    <p className="font-ui text-sm text-gray-500 leading-relaxed line-clamp-3 whitespace-pre-wrap">{memo.content}</p>
+                    <div className="mt-3 flex items-center justify-between">
+                      <p className="font-ui text-xs text-gray-300">{formatDateTime(memo.createdAt)}</p>
+                      {commentCount > 0 && <span className="font-ui text-xs text-gray-300">💬 {commentCount}</span>}
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </section>
+        )}
 
         {/* 빠른 메뉴 */}
-        <section className="grid grid-cols-4 gap-3 mb-8">
+        <section className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           {[
             { href: '/posts/new', icon: '✏️', label: '글쓰기' },
             { href: '/diary/write', icon: '📖', label: '일기' },
             { href: '/calendar', icon: '📅', label: '캘린더' },
             { href: '/anniversary', icon: '💝', label: '기념일' },
           ].map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="card-pastel p-4 text-center hover:scale-105 transition-transform"
-            >
+            <Link key={item.href} href={item.href} className="card-pastel p-4 text-center hover:scale-105 transition-transform">
               <span className="text-2xl block mb-1">{item.icon}</span>
               <span className="text-xs text-gray-500 font-ui">{item.label}</span>
             </Link>
@@ -114,9 +286,7 @@ export default function Home() {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-handwriting text-2xl text-gray-600">최근 이야기</h2>
-            <Link href="/posts" className="text-sm text-pink-400 hover:text-pink-500 font-ui">
-              전체보기
-            </Link>
+            <Link href="/posts" className="text-sm text-pink-400 hover:text-pink-500 font-ui">전체보기</Link>
           </div>
           <div className="space-y-3">
             {loading ? (
