@@ -3,7 +3,20 @@
 import Navbar from '@/components/Navbar'
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { diaryApi } from '@/lib/api'
+
+interface DiaryEntry {
+  id: number
+  mood: string
+  sadContent: string
+  specialContent: string
+  happyContent: string
+  etcContent: string
+  diaryDate: string
+  isShared: boolean
+  authorEmail: string
+  authorName: string
+  createdAt: string
+}
 
 const moods = [
   { emoji: '😊', label: '좋아' },
@@ -20,63 +33,37 @@ export default function EditDiaryPage() {
   const params = useParams()
   const router = useRouter()
   const diaryId = Number(params.id)
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
     mood: '',
-    title: '',
-    content: '',
-    date: '',
+    sadContent: '',
+    specialContent: '',
+    happyContent: '',
+    etcContent: '',
     isShared: true,
   })
 
   useEffect(() => {
-    const loadDiary = async () => {
-      try {
-        const diary = await diaryApi.getById(diaryId)
-        setForm({
-          mood: diary.mood,
-          title: diary.title,
-          content: diary.content,
-          date: diary.diaryDate,
-          isShared: diary.isShared,
-        })
-      } catch {
-        alert('일기를 불러올 수 없습니다.')
-        router.back()
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadDiary()
+    const diaries: DiaryEntry[] = JSON.parse(localStorage.getItem('momento_diaries') || '[]')
+    const diary = diaries.find(d => d.id === diaryId)
+    if (!diary) { router.back(); return }
+    setForm({
+      mood: diary.mood,
+      sadContent: diary.sadContent || '',
+      specialContent: diary.specialContent || '',
+      happyContent: diary.happyContent || '',
+      etcContent: diary.etcContent || '',
+      isShared: diary.isShared,
+    })
   }, [diaryId, router])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setSaving(true)
-    try {
-      await diaryApi.update(diaryId, {
-        title: form.title,
-        content: form.content,
-        mood: form.mood,
-        diaryDate: form.date,
-        isShared: form.isShared,
-      })
-      router.push(`/diary/${diaryId}`)
-    } catch {
-      alert('수정에 실패했습니다.')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-cream-50">
-        <Navbar />
-        <p className="text-center py-12 text-gray-400">불러오는 중...</p>
-      </div>
+    const diaries: DiaryEntry[] = JSON.parse(localStorage.getItem('momento_diaries') || '[]')
+    const updated = diaries.map(d =>
+      d.id === diaryId ? { ...d, ...form } : d
     )
+    localStorage.setItem('momento_diaries', JSON.stringify(updated))
+    router.push(`/diary/${diaryId}`)
   }
 
   return (
@@ -86,9 +73,10 @@ export default function EditDiaryPage() {
       <main className="max-w-2xl mx-auto px-4 py-8 pb-24 md:pb-8">
         <h1 className="font-handwriting text-3xl text-gray-600 mb-6">일기 수정</h1>
 
-        <form onSubmit={handleSubmit} className="card-pastel p-6 space-y-5">
-          <div>
-            <label className="block text-sm text-lavender-400 mb-3 ml-1">오늘의 기분은?</label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+
+          <div className="card-pastel p-5">
+            <label className="block text-sm text-lavender-400 mb-3 font-ui font-bold">오늘의 기분은?</label>
             <div className="flex flex-wrap gap-2">
               {moods.map((mood) => (
                 <button key={mood.emoji} type="button" onClick={() => setForm({ ...form, mood: mood.emoji })}
@@ -102,36 +90,37 @@ export default function EditDiaryPage() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm text-lavender-400 mb-1.5 ml-1">날짜</label>
-            <input type="date" className="input-pastel" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+          <div className="card-pastel p-5">
+            <label className="block text-sm mb-2 font-ui font-bold" style={{ color: '#e8687e' }}>😢 속상하거나 우울했던 일</label>
+            <textarea className="input-pastel min-h-[100px] resize-y" placeholder="없으면 비워도 돼요" value={form.sadContent} onChange={(e) => setForm({ ...form, sadContent: e.target.value })} />
           </div>
 
-          <div>
-            <label className="block text-sm text-lavender-400 mb-1.5 ml-1">제목</label>
-            <input type="text" className="input-pastel" placeholder="오늘 하루를 한 줄로" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+          <div className="card-pastel p-5">
+            <label className="block text-sm mb-2 font-ui font-bold" style={{ color: '#8ec2ff' }}>✨ 오늘 특별했던 일</label>
+            <textarea className="input-pastel min-h-[100px] resize-y" placeholder="없으면 비워도 돼요" value={form.specialContent} onChange={(e) => setForm({ ...form, specialContent: e.target.value })} />
           </div>
 
-          <div>
-            <label className="block text-sm text-lavender-400 mb-1.5 ml-1">일기</label>
-            <textarea className="input-pastel min-h-[250px] resize-y" placeholder="오늘 하루는 어땠나요?" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} required />
+          <div className="card-pastel p-5">
+            <label className="block text-sm mb-2 font-ui font-bold" style={{ color: '#f48da0' }}>🌸 오늘 행복했던 일</label>
+            <textarea className="input-pastel min-h-[100px] resize-y" placeholder="없으면 비워도 돼요" value={form.happyContent} onChange={(e) => setForm({ ...form, happyContent: e.target.value })} />
           </div>
 
-          <div className="flex items-center gap-3 p-3 bg-lavender-50 rounded-xl">
+          <div className="card-pastel p-5">
+            <label className="block text-sm text-gray-400 mb-2 font-ui font-bold">📝 기타</label>
+            <textarea className="input-pastel min-h-[100px] resize-y" placeholder="자유롭게 적어보세요" value={form.etcContent} onChange={(e) => setForm({ ...form, etcContent: e.target.value })} />
+          </div>
+
+          <div className="card-pastel p-4 flex items-center gap-3">
             <button type="button" onClick={() => setForm({ ...form, isShared: !form.isShared })}
-              className={`w-12 h-6 rounded-full transition-all relative ${form.isShared ? 'bg-lavender-300' : 'bg-gray-300'}`}>
+              className={`w-12 h-6 rounded-full transition-all relative flex-shrink-0 ${form.isShared ? 'bg-lavender-300' : 'bg-gray-300'}`}>
               <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${form.isShared ? 'left-6' : 'left-0.5'}`} />
             </button>
-            <span className="text-sm text-gray-500">
-              {form.isShared ? '💑 상대방과 공유' : '🔒 나만 보기'}
-            </span>
+            <span className="text-sm text-gray-500 font-ui">{form.isShared ? '💑 상대방과 공유' : '🔒 나만 보기'}</span>
           </div>
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={() => router.back()} className="btn-secondary">취소</button>
-            <button type="submit" className="btn-primary" disabled={saving}>
-              {saving ? '수정 중...' : '수정하기'}
-            </button>
+            <button type="submit" className="btn-primary">수정하기</button>
           </div>
         </form>
       </main>

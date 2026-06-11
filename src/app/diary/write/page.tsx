@@ -1,9 +1,8 @@
 'use client'
 
 import Navbar from '@/components/Navbar'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { diaryApi } from '@/lib/api'
 import { useAuth } from '@/lib/useAuth'
 
 const moods = [
@@ -20,36 +19,46 @@ const moods = [
 export default function DiaryWritePage() {
   const router = useRouter()
   const { isLoggedIn, loading: authLoading } = useAuth()
-  const [loading, setLoading] = useState(false)
+  const today = new Date().toISOString().split('T')[0]
+  const [alreadyWrote, setAlreadyWrote] = useState(false)
   const [form, setForm] = useState({
     mood: '',
-    title: '',
-    content: '',
-    date: new Date().toISOString().split('T')[0],
+    sadContent: '',
+    specialContent: '',
+    happyContent: '',
+    etcContent: '',
     isShared: true,
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    const email = localStorage.getItem('userEmail') || ''
+    const diaries = JSON.parse(localStorage.getItem('momento_diaries') || '[]')
+    const todayDiary = diaries.find((d: { diaryDate: string; authorEmail: string }) =>
+      d.diaryDate === today && d.authorEmail === email
+    )
+    if (todayDiary) setAlreadyWrote(true)
+  }, [today])
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    try {
-      const email = localStorage.getItem('userEmail') || ''
-      const name = localStorage.getItem('userName') || ''
-      await diaryApi.create({
-        title: form.title,
-        content: form.content,
-        mood: form.mood,
-        diaryDate: form.date,
-        isShared: form.isShared,
-        authorEmail: email,
-        authorName: name,
-      })
-      router.push('/diary')
-    } catch {
-      alert('일기 작성에 실패했습니다.')
-    } finally {
-      setLoading(false)
+    const email = localStorage.getItem('userEmail') || ''
+    const name = localStorage.getItem('userName') || ''
+    const diaries = JSON.parse(localStorage.getItem('momento_diaries') || '[]')
+    const newDiary = {
+      id: Date.now(),
+      mood: form.mood,
+      sadContent: form.sadContent,
+      specialContent: form.specialContent,
+      happyContent: form.happyContent,
+      etcContent: form.etcContent,
+      diaryDate: today,
+      isShared: form.isShared,
+      authorEmail: email,
+      authorName: name,
+      createdAt: new Date().toISOString(),
     }
+    localStorage.setItem('momento_diaries', JSON.stringify([newDiary, ...diaries]))
+    router.push('/diary')
   }
 
   if (authLoading) {
@@ -57,16 +66,37 @@ export default function DiaryWritePage() {
   }
   if (!isLoggedIn) return null
 
+  if (alreadyWrote) {
+    return (
+      <div className="min-h-screen bg-cream-50">
+        <Navbar />
+        <main className="max-w-2xl mx-auto px-4 py-8 pb-24 md:pb-8">
+          <div className="card-pastel p-12 text-center">
+            <p className="text-5xl mb-4">📖</p>
+            <h2 className="font-handwriting text-2xl text-gray-600 mb-2">오늘 일기는 이미 썼어요!</h2>
+            <p className="font-ui text-sm text-gray-400 mb-6">일기는 하루에 한 번만 쓸 수 있어요</p>
+            <button onClick={() => router.push('/diary')} className="btn-primary !w-auto px-8">
+              일기장으로
+            </button>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-cream-50">
       <Navbar />
 
       <main className="max-w-2xl mx-auto px-4 py-8 pb-24 md:pb-8">
-        <h1 className="font-handwriting text-3xl text-gray-600 mb-6">오늘의 일기</h1>
+        <h1 className="font-handwriting text-3xl text-gray-600 mb-2">오늘의 일기</h1>
+        <p className="font-ui text-sm text-gray-400 mb-6">{today.replaceAll('-', '.')}</p>
 
-        <form onSubmit={handleSubmit} className="card-pastel p-6 space-y-5">
-          <div>
-            <label className="block text-sm text-lavender-400 mb-3 ml-1">오늘의 기분은?</label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* 오늘의 기분 */}
+          <div className="card-pastel p-5">
+            <label className="block text-sm text-lavender-400 mb-3 font-ui font-bold">오늘의 기분은?</label>
             <div className="flex flex-wrap gap-2">
               {moods.map((mood) => (
                 <button key={mood.emoji} type="button" onClick={() => setForm({ ...form, mood: mood.emoji })}
@@ -80,35 +110,73 @@ export default function DiaryWritePage() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm text-lavender-400 mb-1.5 ml-1">날짜</label>
-            <input type="date" className="input-pastel" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+          {/* 속상했던 일 */}
+          <div className="card-pastel p-5">
+            <label className="block text-sm mb-2 font-ui font-bold" style={{ color: '#e8687e' }}>
+              😢 속상하거나 우울했던 일
+            </label>
+            <textarea
+              className="input-pastel min-h-[100px] resize-y"
+              placeholder="오늘 마음이 무거웠던 일이 있었나요? (없으면 비워도 돼요)"
+              value={form.sadContent}
+              onChange={(e) => setForm({ ...form, sadContent: e.target.value })}
+            />
           </div>
 
-          <div>
-            <label className="block text-sm text-lavender-400 mb-1.5 ml-1">제목</label>
-            <input type="text" className="input-pastel" placeholder="오늘 하루를 한 줄로" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+          {/* 특별했던 일 */}
+          <div className="card-pastel p-5">
+            <label className="block text-sm mb-2 font-ui font-bold" style={{ color: '#8ec2ff' }}>
+              ✨ 오늘 특별했던 일
+            </label>
+            <textarea
+              className="input-pastel min-h-[100px] resize-y"
+              placeholder="오늘 기억에 남는 특별한 순간이 있었나요? (없으면 비워도 돼요)"
+              value={form.specialContent}
+              onChange={(e) => setForm({ ...form, specialContent: e.target.value })}
+            />
           </div>
 
-          <div>
-            <label className="block text-sm text-lavender-400 mb-1.5 ml-1">일기</label>
-            <textarea className="input-pastel min-h-[250px] resize-y" placeholder="오늘 하루는 어땠나요?" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} required />
+          {/* 행복했던 일 */}
+          <div className="card-pastel p-5">
+            <label className="block text-sm mb-2 font-ui font-bold" style={{ color: '#f48da0' }}>
+              🌸 오늘 행복했던 일
+            </label>
+            <textarea
+              className="input-pastel min-h-[100px] resize-y"
+              placeholder="오늘 기분 좋았던 일을 적어보세요 (없으면 비워도 돼요)"
+              value={form.happyContent}
+              onChange={(e) => setForm({ ...form, happyContent: e.target.value })}
+            />
           </div>
 
-          <div className="flex items-center gap-3 p-3 bg-lavender-50 rounded-xl">
+          {/* 기타 */}
+          <div className="card-pastel p-5">
+            <label className="block text-sm text-gray-400 mb-2 font-ui font-bold">
+              📝 기타
+            </label>
+            <textarea
+              className="input-pastel min-h-[100px] resize-y"
+              placeholder="그 밖에 하고 싶은 말을 자유롭게 적어보세요"
+              value={form.etcContent}
+              onChange={(e) => setForm({ ...form, etcContent: e.target.value })}
+            />
+          </div>
+
+          {/* 공유 설정 */}
+          <div className="card-pastel p-4 flex items-center gap-3">
             <button type="button" onClick={() => setForm({ ...form, isShared: !form.isShared })}
-              className={`w-12 h-6 rounded-full transition-all relative ${form.isShared ? 'bg-lavender-300' : 'bg-gray-300'}`}>
+              className={`w-12 h-6 rounded-full transition-all relative flex-shrink-0 ${form.isShared ? 'bg-lavender-300' : 'bg-gray-300'}`}>
               <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${form.isShared ? 'left-6' : 'left-0.5'}`} />
             </button>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 font-ui">
               {form.isShared ? '💑 상대방과 공유' : '🔒 나만 보기'}
             </span>
           </div>
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={() => router.back()} className="btn-secondary">취소</button>
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? '저장 중...' : '저장하기'}
+            <button type="submit" className="btn-primary" disabled={!form.mood}>
+              {!form.mood ? '기분을 선택해주세요' : '저장하기'}
             </button>
           </div>
         </form>

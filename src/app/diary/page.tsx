@@ -3,31 +3,29 @@
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { diaryApi, DiaryData } from '@/lib/api'
+interface DiaryData {
+  id: number
+  mood: string
+  sadContent: string
+  specialContent: string
+  happyContent: string
+  etcContent: string
+  diaryDate: string
+  isShared: boolean
+  authorEmail: string
+  authorName: string
+  createdAt: string
+}
 
 export default function DiaryPage() {
   const [filter, setFilter] = useState<'all' | 'mine'>('all')
   const [diaries, setDiaries] = useState<DiaryData[]>([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadDiaries()
+    const all: DiaryData[] = JSON.parse(localStorage.getItem('momento_diaries') || '[]')
+    const email = localStorage.getItem('userEmail') || ''
+    setDiaries(filter === 'mine' ? all.filter(d => d.authorEmail === email) : all)
   }, [filter])
-
-  const loadDiaries = async () => {
-    setLoading(true)
-    try {
-      const email = localStorage.getItem('userEmail') || ''
-      const data = filter === 'mine'
-        ? await diaryApi.getAll(email)
-        : await diaryApi.getAll()
-      setDiaries(data)
-    } catch {
-      setDiaries([])
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return ''
@@ -74,9 +72,7 @@ export default function DiaryPage() {
           ))}
         </div>
 
-        {loading ? (
-          <p className="text-center text-gray-400 py-8 font-ui">불러오는 중...</p>
-        ) : diaries.length === 0 ? (
+        {diaries.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-3xl mb-2">📖</p>
             <p className="text-gray-400 font-ui">아직 일기가 없어요</p>
@@ -98,7 +94,9 @@ export default function DiaryPage() {
                           <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-400">🔒</span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-400 truncate font-ui">{diary.content}</p>
+                      <p className="text-sm text-gray-400 truncate font-ui">
+                        {diary.happyContent || diary.specialContent || diary.sadContent || diary.etcContent || '내용 없음'}
+                      </p>
                       <div className="flex items-center gap-3 mt-2">
                         <span className="text-xs text-gray-400 font-ui">{formatDate(diary.diaryDate)}</span>
                         <span className="text-xs text-lavender-400 font-ui">{diary.authorName}</span>
