@@ -1,9 +1,7 @@
 'use client'
 
 import Navbar from '@/components/Navbar'
-import { useState, useEffect, useRef, useCallback } from 'react'
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'
+import { useState, useEffect, useRef } from 'react'
 
 interface ChatMessage {
   id: number
@@ -16,69 +14,37 @@ interface ChatMessage {
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
-  const [sending, setSending] = useState(false)
   const [myEmail, setMyEmail] = useState('')
   const [myName, setMyName] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  const loadMessages = useCallback(async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/chat`, { cache: 'no-store' })
-      if (res.ok) {
-        const data = await res.json()
-        setMessages(data)
-      }
-    } catch {
-      // 서버 연결 실패
-    }
-  }, [])
-
   useEffect(() => {
     setMyEmail(localStorage.getItem('userEmail') || '')
     setMyName(localStorage.getItem('userName') || '')
-    loadMessages()
-  }, [loadMessages])
+    setMessages(JSON.parse(localStorage.getItem('momento_chat') || '[]'))
+  }, [])
 
   useEffect(() => {
-    scrollToBottom()
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  // 3초마다 새 메시지 폴링
-  useEffect(() => {
-    const interval = setInterval(loadMessages, 3000)
-    return () => clearInterval(interval)
-  }, [loadMessages])
-
-  const handleSend = async (e: React.FormEvent) => {
+  const handleSend = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input.trim() || sending) return
+    if (!input.trim()) return
 
-    setSending(true)
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          senderEmail: myEmail,
-          senderName: myName,
-          content: input.trim(),
-        }),
-      })
-      if (res.ok) {
-        setInput('')
-        loadMessages()
-        inputRef.current?.focus()
-      }
-    } catch {
-      alert('메시지 전송에 실패했습니다.')
-    } finally {
-      setSending(false)
+    const newMsg: ChatMessage = {
+      id: Date.now(),
+      senderEmail: myEmail,
+      senderName: myName,
+      content: input.trim(),
+      createdAt: new Date().toISOString(),
     }
+    const updated = [...messages, newMsg]
+    setMessages(updated)
+    localStorage.setItem('momento_chat', JSON.stringify(updated))
+    setInput('')
+    inputRef.current?.focus()
   }
 
   const formatTime = (dateStr: string) => {
@@ -94,11 +60,6 @@ export default function ChatPage() {
     return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`
   }
 
-  // 날짜별 그룹핑
-  const getDateKey = (dateStr: string) => {
-    return new Date(dateStr).toISOString().split('T')[0]
-  }
-
   let lastDateKey = ''
 
   return (
@@ -106,14 +67,12 @@ export default function ChatPage() {
       <Navbar />
 
       <main className="flex-1 flex flex-col max-w-2xl mx-auto w-full">
-        {/* 채팅 헤더 */}
         <div className="px-4 py-3 border-b border-pink-100 bg-white/50">
           <h1 className="font-handwriting text-2xl text-gray-600 text-center">둘만의 비밀 채팅</h1>
           <p className="font-ui text-xs text-gray-400 text-center">💕 여기서 나눈 이야기는 둘만의 비밀이에요</p>
         </div>
 
-        {/* 메시지 영역 */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ maxHeight: 'calc(100vh - 240px)' }}>
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ maxHeight: 'calc(100vh - 300px)' }}>
           {messages.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-4xl mb-3">💌</p>
@@ -123,7 +82,7 @@ export default function ChatPage() {
           ) : (
             messages.map((msg) => {
               const isMe = msg.senderEmail === myEmail
-              const dateKey = getDateKey(msg.createdAt)
+              const dateKey = new Date(msg.createdAt).toISOString().split('T')[0]
               let showDateHeader = false
               if (dateKey !== lastDateKey) {
                 showDateHeader = true
@@ -149,13 +108,11 @@ export default function ChatPage() {
                       {!isMe && (
                         <span className="font-ui text-xs text-gray-400 mb-1 ml-1">{msg.senderName}</span>
                       )}
-                      <div
-                        className={`max-w-[240px] px-4 py-2.5 rounded-2xl font-ui text-sm leading-relaxed ${
-                          isMe
-                            ? 'bg-gradient-to-r from-pink-200 to-lavender-200 text-gray-700 rounded-br-md'
-                            : 'bg-white border border-pink-100 text-gray-600 rounded-bl-md'
-                        }`}
-                      >
+                      <div className={`max-w-[75vw] sm:max-w-[320px] px-4 py-2.5 rounded-2xl font-ui text-sm leading-relaxed ${
+                        isMe
+                          ? 'bg-gradient-to-r from-pink-200 to-lavender-200 text-gray-700 rounded-br-md'
+                          : 'bg-white border border-pink-100 text-gray-600 rounded-bl-md'
+                      }`}>
                         {msg.content}
                       </div>
                       <span className="font-ui text-xs text-gray-300 mt-1 mx-1">{formatTime(msg.createdAt)}</span>
@@ -173,7 +130,6 @@ export default function ChatPage() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* 입력 영역 */}
         <div className="p-4 border-t border-pink-100 bg-white/80 backdrop-blur-sm mb-16 md:mb-0">
           <form onSubmit={handleSend} className="flex gap-2">
             <input
@@ -186,7 +142,7 @@ export default function ChatPage() {
             />
             <button
               type="submit"
-              disabled={!input.trim() || sending}
+              disabled={!input.trim()}
               className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-300 to-lavender-300 text-white flex items-center justify-center hover:from-pink-400 hover:to-lavender-400 transition-all disabled:opacity-50 flex-shrink-0"
             >
               ♥

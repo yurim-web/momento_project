@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { userApi } from '@/lib/api'
+import Modal from '@/components/Modal'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -16,54 +16,49 @@ export default function SignupPage() {
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
     if (form.password !== form.passwordConfirm) {
       setError('비밀번호가 일치하지 않아요!')
       return
     }
+
     setLoading(true)
-    try {
-      const res = await userApi.signup({
-        email: form.email,
-        password: form.password,
-        name: form.name,
-        phone: form.phone,
-      })
-      if (res.status === 'success') {
-        alert('가입이 완료되었어요! 로그인해주세요.')
-        router.push('/login')
-      } else {
-        setError(res.message)
-      }
-    } catch {
-      setError('서버에 연결할 수 없습니다.')
-    } finally {
+
+    const users = JSON.parse(localStorage.getItem('momento_users') || '[]')
+    const exists = users.some((u: { email: string }) => u.email === form.email)
+
+    if (exists) {
+      setError('이미 사용 중인 이메일이에요.')
       setLoading(false)
+      return
     }
+
+    users.push({ email: form.email, password: form.password, name: form.name, phone: form.phone })
+    localStorage.setItem('momento_users', JSON.stringify(users))
+    setShowSuccess(true)
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-cream-50">
-      {/* 배경 장식 */}
       <div className="absolute top-10 right-16 w-36 h-36 bg-lavender-100 rounded-full blur-3xl opacity-60" />
       <div className="absolute bottom-10 left-16 w-32 h-32 bg-pink-100 rounded-full blur-3xl opacity-60" />
       <div className="absolute top-1/2 left-10 w-28 h-28 bg-mint-100 rounded-full blur-3xl opacity-40" />
 
       <div className="w-full max-w-md relative">
-        {/* 로고 */}
         <div className="text-center mb-8">
           <h1 className="font-handwriting text-5xl text-pink-400 mb-2">Momento</h1>
           <p className="font-handwriting text-lg text-pink-300">우리의 특별한 순간들</p>
         </div>
 
-        {/* 회원가입 카드 */}
         <div className="card-pastel p-8">
           <h2 className="font-handwriting text-2xl text-center text-gray-600 mb-6">
             새로운 이야기를 시작해요 ✿
@@ -158,6 +153,16 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
+
+      {showSuccess && (
+        <Modal
+          type="alert"
+          title="가입 완료! 🎉"
+          message="로그인해서 우리의 이야기를 시작해요"
+          confirmText="로그인하러 가기"
+          onConfirm={() => router.push('/login')}
+        />
+      )}
     </div>
   )
 }
