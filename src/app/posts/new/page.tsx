@@ -3,7 +3,6 @@
 import Navbar from '@/components/Navbar'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { postApi } from '@/lib/api'
 import { useAuth } from '@/lib/useAuth'
 
 const categories = ['데이트', '여행', '기념일', '일상', '맛집']
@@ -11,7 +10,6 @@ const categories = ['데이트', '여행', '기념일', '일상', '맛집']
 export default function NewPostPage() {
   const router = useRouter()
   const { isLoggedIn, loading: authLoading } = useAuth()
-  const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
     title: '',
     content: '',
@@ -20,27 +18,24 @@ export default function NewPostPage() {
     location: '',
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    try {
-      const email = localStorage.getItem('userEmail') || ''
-      const name = localStorage.getItem('userName') || ''
-      await postApi.create({
-        title: form.title,
-        content: form.content,
-        category: form.category,
-        location: form.location || undefined,
-        eventDate: form.date,
-        authorEmail: email,
-        authorName: name,
-      })
-      router.push('/posts')
-    } catch {
-      alert('게시글 작성에 실패했습니다.')
-    } finally {
-      setLoading(false)
+    const email = localStorage.getItem('userEmail') || ''
+    const name = localStorage.getItem('userName') || ''
+    const posts = JSON.parse(localStorage.getItem('momento_posts') || '[]')
+    const newPost = {
+      id: Date.now(),
+      title: form.title,
+      content: form.content,
+      category: form.category,
+      location: form.location || undefined,
+      eventDate: form.date,
+      authorEmail: email,
+      authorName: name,
+      createdAt: new Date().toISOString(),
     }
+    localStorage.setItem('momento_posts', JSON.stringify([newPost, ...posts]))
+    router.push('/posts')
   }
 
   if (authLoading) {
@@ -97,20 +92,9 @@ export default function NewPostPage() {
             <textarea className="input-pastel min-h-[200px] resize-y" placeholder="우리의 이야기를 적어주세요..." value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} required />
           </div>
 
-          <div>
-            <label className="block text-sm text-pink-400 mb-1.5 ml-1">사진</label>
-            <div className="border-2 border-dashed border-pink-200 rounded-2xl p-8 text-center hover:border-pink-300 transition-colors cursor-pointer">
-              <p className="text-3xl mb-2">📷</p>
-              <p className="text-sm text-gray-400">사진을 추가해주세요</p>
-              <p className="text-xs text-gray-300 mt-1">클릭하거나 드래그해서 업로드</p>
-            </div>
-          </div>
-
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={() => router.back()} className="btn-secondary">취소</button>
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? '작성 중...' : '작성하기'}
-            </button>
+            <button type="submit" className="btn-primary">작성하기</button>
           </div>
         </form>
       </main>

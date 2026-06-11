@@ -3,7 +3,7 @@
 import Navbar from '@/components/Navbar'
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { postApi } from '@/lib/api'
+import { PostData } from '@/lib/api'
 
 const categories = ['데이트', '여행', '기념일', '일상', '맛집']
 
@@ -11,7 +11,6 @@ export default function EditPostPage() {
   const params = useParams()
   const router = useRouter()
   const postId = Number(params.id)
-  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
     title: '',
@@ -22,52 +21,22 @@ export default function EditPostPage() {
   })
 
   useEffect(() => {
-    const loadPost = async () => {
-      try {
-        const post = await postApi.getById(postId)
-        setForm({
-          title: post.title,
-          content: post.content,
-          category: post.category,
-          date: post.eventDate || '',
-          location: post.location || '',
-        })
-      } catch {
-        alert('게시글을 불러올 수 없습니다.')
-        router.back()
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadPost()
+    const posts: PostData[] = JSON.parse(localStorage.getItem('momento_posts') || '[]')
+    const post = posts.find(p => p.id === postId)
+    if (!post) { router.back(); return }
+    setForm({ title: post.title, content: post.content, category: post.category, date: post.eventDate || '', location: post.location || '' })
   }, [postId, router])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
-    try {
-      await postApi.update(postId, {
-        title: form.title,
-        content: form.content,
-        category: form.category,
-        location: form.location || undefined,
-        eventDate: form.date,
-      })
-      router.push(`/posts/${postId}`)
-    } catch {
-      alert('수정에 실패했습니다.')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-cream-50">
-        <Navbar />
-        <p className="text-center py-12 text-gray-400">불러오는 중...</p>
-      </div>
+    const posts: PostData[] = JSON.parse(localStorage.getItem('momento_posts') || '[]')
+    const updated = posts.map(p =>
+      p.id === postId ? { ...p, title: form.title, content: form.content, category: form.category, location: form.location || undefined, eventDate: form.date } : p
     )
+    localStorage.setItem('momento_posts', JSON.stringify(updated))
+    setSaving(false)
+    router.push(`/posts/${postId}`)
   }
 
   return (
@@ -100,7 +69,7 @@ export default function EditPostPage() {
 
           <div>
             <label className="block text-sm text-pink-400 mb-1.5 ml-1">제목</label>
-            <input type="text" className="input-pastel" placeholder="오늘의 이야기 제목" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+            <input type="text" className="input-pastel" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -110,13 +79,13 @@ export default function EditPostPage() {
             </div>
             <div>
               <label className="block text-sm text-pink-400 mb-1.5 ml-1">장소</label>
-              <input type="text" className="input-pastel" placeholder="어디서?" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
+              <input type="text" className="input-pastel" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
             </div>
           </div>
 
           <div>
             <label className="block text-sm text-pink-400 mb-1.5 ml-1">내용</label>
-            <textarea className="input-pastel min-h-[200px] resize-y" placeholder="우리의 이야기를 적어주세요..." value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} required />
+            <textarea className="input-pastel min-h-[200px] resize-y" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} required />
           </div>
 
           <div className="flex gap-3 pt-2">

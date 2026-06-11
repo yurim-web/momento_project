@@ -1,10 +1,11 @@
 'use client'
 
 import Navbar from '@/components/Navbar'
+import Modal from '@/components/Modal'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { postApi, PostData, CommentData } from '@/lib/api'
+import { PostData, CommentData } from '@/lib/api'
 
 export default function PostDetailPage() {
   const params = useParams()
@@ -13,58 +14,39 @@ export default function PostDetailPage() {
   const [post, setPost] = useState<PostData | null>(null)
   const [comments, setComments] = useState<CommentData[]>([])
   const [newComment, setNewComment] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   useEffect(() => {
-    loadPost()
-    loadComments()
+    const posts: PostData[] = JSON.parse(localStorage.getItem('momento_posts') || '[]')
+    setPost(posts.find(p => p.id === postId) || null)
+
+    const allComments: CommentData[] = JSON.parse(localStorage.getItem('momento_comments') || '[]')
+    setComments(allComments.filter(c => c.postId === postId))
   }, [postId])
 
-  const loadPost = async () => {
-    try {
-      const data = await postApi.getById(postId)
-      setPost(data)
-    } catch {
-      console.error('게시글을 불러올 수 없습니다.')
-    } finally {
-      setLoading(false)
-    }
+  const handleDelete = () => {
+    const posts: PostData[] = JSON.parse(localStorage.getItem('momento_posts') || '[]')
+    localStorage.setItem('momento_posts', JSON.stringify(posts.filter(p => p.id !== postId)))
+    router.push('/posts')
   }
 
-  const loadComments = async () => {
-    try {
-      const data = await postApi.getComments(postId)
-      setComments(data)
-    } catch {
-      console.error('댓글을 불러올 수 없습니다.')
-    }
-  }
-
-  const handleDelete = async () => {
-    if (!confirm('정말 삭제할까요?')) return
-    try {
-      await postApi.delete(postId)
-      router.push('/posts')
-    } catch {
-      alert('삭제에 실패했습니다.')
-    }
-  }
-
-  const handleCommentSubmit = async () => {
+  const handleCommentSubmit = () => {
     if (!newComment.trim()) return
-    try {
-      const email = localStorage.getItem('userEmail') || ''
-      const name = localStorage.getItem('userName') || ''
-      await postApi.createComment(postId, {
-        content: newComment,
-        authorEmail: email,
-        authorName: name,
-      })
-      setNewComment('')
-      loadComments()
-    } catch {
-      alert('댓글 작성에 실패했습니다.')
+    const email = localStorage.getItem('userEmail') || ''
+    const name = localStorage.getItem('userName') || ''
+    const allComments: CommentData[] = JSON.parse(localStorage.getItem('momento_comments') || '[]')
+    const comment: CommentData = {
+      id: Date.now(),
+      postId,
+      content: newComment,
+      authorEmail: email,
+      authorName: name,
+      createdAt: new Date().toISOString(),
     }
+    const updated = [...allComments, comment]
+    localStorage.setItem('momento_comments', JSON.stringify(updated))
+    setComments(updated.filter(c => c.postId === postId))
+    setNewComment('')
   }
 
   const formatDate = (dateStr?: string) => {
@@ -73,7 +55,6 @@ export default function PostDetailPage() {
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
   }
 
-  if (loading) return <div className="min-h-screen bg-cream-50"><Navbar /><p className="text-center py-12 text-gray-400">불러오는 중...</p></div>
   if (!post) return <div className="min-h-screen bg-cream-50"><Navbar /><p className="text-center py-12 text-gray-400">게시글을 찾을 수 없습니다.</p></div>
 
   return (
@@ -110,7 +91,7 @@ export default function PostDetailPage() {
             <Link href={`/posts/${post.id}/edit`} className="btn-secondary text-center text-sm">
               수정하기
             </Link>
-            <button onClick={handleDelete} className="btn-secondary text-sm text-red-300 border-red-100 hover:bg-red-50 hover:border-red-200">
+            <button onClick={() => setShowDeleteModal(true)} className="btn-secondary text-sm text-red-300 border-red-100 hover:bg-red-50 hover:border-red-200">
               삭제하기
             </button>
           </div>
@@ -149,6 +130,18 @@ export default function PostDetailPage() {
           </div>
         </section>
       </main>
+
+      {showDeleteModal && (
+        <Modal
+          type="confirm"
+          title="게시글을 삭제할까요?"
+          message="삭제하면 되돌릴 수 없어요"
+          confirmText="삭제하기"
+          cancelText="취소"
+          onConfirm={handleDelete}
+          onCancel={() => setShowDeleteModal(false)}
+        />
+      )}
     </div>
   )
 }
