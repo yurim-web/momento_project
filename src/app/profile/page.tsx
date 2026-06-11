@@ -1,6 +1,7 @@
 'use client'
 
 import Navbar from '@/components/Navbar'
+import Modal from '@/components/Modal'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -13,6 +14,7 @@ export default function ProfilePage() {
   const [person1, setPerson1] = useState({ name: '나', email: '' })
   const [person2, setPerson2] = useState({ name: '당신', email: '' })
   const [toast, setToast] = useState<string | null>(null)
+  const [modal, setModal] = useState<{ title: string; message?: string; onConfirm: () => void } | null>(null)
   const [showThemeModal, setShowThemeModal] = useState(false)
   const [showNotifModal, setShowNotifModal] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
@@ -23,6 +25,8 @@ export default function ProfilePage() {
     schedule: true,
     diary: false,
   })
+  const [myPhoto, setMyPhoto] = useState<string | null>(null)
+  const [partnerPhoto, setPartnerPhoto] = useState<string | null>(null)
 
   useEffect(() => {
     const savedStartDate = localStorage.getItem('coupleStartDate')
@@ -38,6 +42,8 @@ export default function ProfilePage() {
     if (savedNotif) setNotifSettings(JSON.parse(savedNotif))
     setPerson1({ name: userName, email: userEmail })
     setPerson2({ name: partnerName, email: partnerEmail })
+    setMyPhoto(localStorage.getItem('myProfilePhoto'))
+    setPartnerPhoto(localStorage.getItem('partnerProfilePhoto'))
   }, [])
 
   const getDDay = () => {
@@ -57,10 +63,15 @@ export default function ProfilePage() {
   }
 
   const handleLogout = () => {
-    if (!confirm('로그아웃 하시겠어요?')) return
-    localStorage.removeItem('userEmail')
-    localStorage.removeItem('userName')
-    router.push('/login')
+    setModal({
+      title: '로그아웃 할까요?',
+      message: '다음에 또 만나요 👋',
+      onConfirm: () => {
+        localStorage.removeItem('userEmail')
+        localStorage.removeItem('userName')
+        router.push('/login')
+      },
+    })
   }
 
   const showToast = (msg: string) => {
@@ -89,6 +100,24 @@ export default function ProfilePage() {
     showToast('별명이 변경되었어요')
   }
 
+  const handlePhotoChange = (who: 'me' | 'partner', e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const base64 = reader.result as string
+      if (who === 'me') {
+        setMyPhoto(base64)
+        localStorage.setItem('myProfilePhoto', base64)
+      } else {
+        setPartnerPhoto(base64)
+        localStorage.setItem('partnerProfilePhoto', base64)
+      }
+      showToast('프로필 사진이 변경되었어요')
+    }
+    reader.readAsDataURL(file)
+  }
+
   const handleExportData = () => {
     const data = {
       profile: { person1, person2, startDate, todayMessage },
@@ -113,31 +142,45 @@ export default function ProfilePage() {
 
         {/* 커플 프로필 카드 */}
         <div className="card-pastel p-8 text-center mb-6">
-          <div className="flex items-center justify-center gap-6 mb-6">
-            <button onClick={openProfileModal} className="flex flex-col items-center gap-2 group">
-              <div className="w-20 h-20 rounded-full bg-pink-100 flex items-center justify-center border-2 border-pink-200 group-hover:border-pink-300 transition-colors">
-                <span className="font-handwriting text-2xl text-pink-400">
-                  {person1.name[0]}
-                </span>
-              </div>
-              <span className="font-ui text-sm text-gray-600 font-bold group-hover:text-pink-400 transition-colors">{person1.name} ✎</span>
+          <div className="flex items-center justify-center gap-4 sm:gap-8 mb-6">
+            {/* 내 프로필 */}
+            <div className="flex flex-col items-center gap-2">
+              <label className="cursor-pointer group relative">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-pink-100 flex items-center justify-center border-2 border-pink-200 group-hover:border-pink-300 transition-colors overflow-hidden">
+                  {myPhoto ? (
+                    <img src={myPhoto} alt="내 프로필" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="font-handwriting text-2xl text-pink-400">{person1.name[0]}</span>
+                  )}
+                </div>
+                <span className="absolute bottom-0 right-0 w-6 h-6 bg-pink-300 rounded-full flex items-center justify-center text-white text-xs shadow">✎</span>
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhotoChange('me', e)} />
+              </label>
+              <button onClick={openProfileModal} className="font-ui text-sm text-gray-600 font-bold hover:text-pink-400 transition-colors">{person1.name} ✎</button>
               <span className="font-ui text-xs text-gray-400">{person1.email}</span>
-            </button>
+            </div>
 
             <div className="flex flex-col items-center">
               <span className="text-3xl">♥</span>
               <span className="font-handwriting text-xl text-pink-400 mt-1">D+{getDDay()}</span>
             </div>
 
-            <button onClick={openProfileModal} className="flex flex-col items-center gap-2 group">
-              <div className="w-20 h-20 rounded-full bg-lavender-100 flex items-center justify-center border-2 border-lavender-200 group-hover:border-lavender-300 transition-colors">
-                <span className="font-handwriting text-2xl text-lavender-400">
-                  {person2.name[0]}
-                </span>
-              </div>
-              <span className="font-ui text-sm text-gray-600 font-bold group-hover:text-lavender-400 transition-colors">{person2.name} ✎</span>
+            {/* 상대방 프로필 */}
+            <div className="flex flex-col items-center gap-2">
+              <label className="cursor-pointer group relative">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-lavender-100 flex items-center justify-center border-2 border-lavender-200 group-hover:border-lavender-300 transition-colors overflow-hidden">
+                  {partnerPhoto ? (
+                    <img src={partnerPhoto} alt="상대방 프로필" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="font-handwriting text-2xl text-lavender-400">{person2.name[0]}</span>
+                  )}
+                </div>
+                <span className="absolute bottom-0 right-0 w-6 h-6 bg-lavender-300 rounded-full flex items-center justify-center text-white text-xs shadow">✎</span>
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhotoChange('partner', e)} />
+              </label>
+              <button onClick={openProfileModal} className="font-ui text-sm text-gray-600 font-bold hover:text-lavender-400 transition-colors">{person2.name} ✎</button>
               <span className="font-ui text-xs text-gray-400">{person2.email}</span>
-            </button>
+            </div>
           </div>
 
           {/* 사귄 날짜 */}
@@ -341,6 +384,19 @@ export default function ProfilePage() {
             <button onClick={() => setShowThemeModal(false)} className="btn-secondary mt-4">닫기</button>
           </div>
         </div>
+      )}
+
+      {/* 확인 모달 */}
+      {modal && (
+        <Modal
+          type="confirm"
+          title={modal.title}
+          message={modal.message}
+          confirmText="확인"
+          cancelText="취소"
+          onConfirm={() => { modal.onConfirm(); setModal(null) }}
+          onCancel={() => setModal(null)}
+        />
       )}
 
       {/* 토스트 메시지 */}
