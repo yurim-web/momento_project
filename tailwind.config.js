@@ -8,13 +8,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // CSS 변수로 연결 — 테마 변경 시 런타임에 교체됨
         pink: {
-          50: '#fef7f7',
-          100: '#fdeef0',
-          200: '#fbd5dc',
-          300: '#f8b4c0',
-          400: '#f48da0',
-          500: '#e8687e',
+          50:  'var(--p50)',
+          100: 'var(--p100)',
+          200: 'var(--p200)',
+          300: 'var(--p300)',
+          400: 'var(--p400)',
+          500: 'var(--p500)',
         },
         lavender: {
           50: '#f0f7ff',
@@ -41,7 +42,7 @@ module.exports = {
           500: '#f08c40',
         },
         cream: {
-          50: '#fffdf7',
+          50: 'var(--bg)',
           100: '#fef9ee',
           200: '#fdf2d9',
         },

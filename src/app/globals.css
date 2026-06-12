@@ -5,6 +5,258 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ───────────────────────────────────────────
+   테마 CSS 변수 — 기본(벚꽃/핑크)
+─────────────────────────────────────────── */
+:root,
+html[data-theme="blossom"] {
+  --p50:  #fef7f7;
+  --p100: #fdeef0;
+  --p200: #fbd5dc;
+  --p300: #f8b4c0;
+  --p400: #f48da0;
+  --p500: #e8687e;
+
+  --bg:          #fffdf7;
+  --bg-sec:      #fef9f5;
+  --card-bg:     #ffffff;
+  --card-border: #fdeef0;
+  --card-shadow: rgba(232, 104, 126, 0.08);
+
+  --input-border:      #fbd5dc;
+  --input-bg:          #fef7f7;
+  --input-placeholder: #d4a0aa;
+  --input-focus:       #f48da0;
+  --input-focus-ring:  rgba(244, 141, 160, 0.15);
+
+  --btn2-color:  #e8687e;
+  --btn2-border: #fbd5dc;
+  --btn2-hover:  #fef7f7;
+
+  --scroll-track: #fef7f7;
+  --scroll-thumb: #fbd5dc;
+  --scroll-hover: #f8b4c0;
+
+  --text-main: #4a4a4a;
+  --text-sub:  #9ca3af;
+}
+
+/* ── 라벤더(보라) ── */
+html[data-theme="lavender"] {
+  --p50:  #f5f3ff;
+  --p100: #ede9fe;
+  --p200: #ddd6fe;
+  --p300: #c4b5fd;
+  --p400: #a78bfa;
+  --p500: #7c3aed;
+
+  --bg:          #fdfcff;
+  --bg-sec:      #f8f6ff;
+  --card-bg:     #ffffff;
+  --card-border: #ede9fe;
+  --card-shadow: rgba(124, 58, 237, 0.06);
+
+  --input-border:      #ddd6fe;
+  --input-bg:          #f9f7ff;
+  --input-placeholder: #b8a9d4;
+  --input-focus:       #a78bfa;
+  --input-focus-ring:  rgba(167, 139, 250, 0.15);
+
+  --btn2-color:  #7c3aed;
+  --btn2-border: #ddd6fe;
+  --btn2-hover:  #f5f3ff;
+
+  --scroll-track: #f9f7ff;
+  --scroll-thumb: #ddd6fe;
+  --scroll-hover: #c4b5fd;
+
+  --text-main: #4a4a4a;
+  --text-sub:  #9ca3af;
+}
+
+/* ── 민트(초록) ── */
+html[data-theme="mint"] {
+  --p50:  #f0fdf9;
+  --p100: #ddfbf0;
+  --p200: #bef5e0;
+  --p300: #8dead0;
+  --p400: #5ed8b8;
+  --p500: #3dbe9e;
+
+  --bg:          #f7fffe;
+  --bg-sec:      #f0fdf9;
+  --card-bg:     #ffffff;
+  --card-border: #ddfbf0;
+  --card-shadow: rgba(61, 190, 158, 0.06);
+
+  --input-border:      #bef5e0;
+  --input-bg:          #f0fdf9;
+  --input-placeholder: #8ecfc0;
+  --input-focus:       #5ed8b8;
+  --input-focus-ring:  rgba(94, 216, 184, 0.15);
+
+  --btn2-color:  #3dbe9e;
+  --btn2-border: #bef5e0;
+  --btn2-hover:  #f0fdf9;
+
+  --scroll-track: #f0fdf9;
+  --scroll-thumb: #bef5e0;
+  --scroll-hover: #8dead0;
+
+  --text-main: #4a4a4a;
+  --text-sub:  #9ca3af;
+}
+
+/* ── 피치(복숭아) ── */
+html[data-theme="peach"] {
+  --p50:  #fff8f3;
+  --p100: #ffedd9;
+  --p200: #ffdbb5;
+  --p300: #ffc48d;
+  --p400: #ffa960;
+  --p500: #f08c40;
+
+  --bg:          #fffcf8;
+  --bg-sec:      #fff8f3;
+  --card-bg:     #ffffff;
+  --card-border: #ffedd9;
+  --card-shadow: rgba(240, 140, 64, 0.06);
+
+  --input-border:      #ffdbb5;
+  --input-bg:          #fff8f3;
+  --input-placeholder: #f5c0a0;
+  --input-focus:       #ffa960;
+  --input-focus-ring:  rgba(255, 169, 96, 0.15);
+
+  --btn2-color:  #f08c40;
+  --btn2-border: #ffdbb5;
+  --btn2-hover:  #fff8f3;
+
+  --scroll-track: #fff8f3;
+  --scroll-thumb: #ffdbb5;
+  --scroll-hover: #ffc48d;
+
+  --text-main: #4a4a4a;
+  --text-sub:  #9ca3af;
+}
+
+/* ── 하늘(파랑) ── */
+html[data-theme="sky"] {
+  --p50:  #f0f7ff;
+  --p100: #e0efff;
+  --p200: #b9daff;
+  --p300: #8ec2ff;
+  --p400: #60a5fa;
+  --p500: #3b82f6;
+
+  --bg:          #f8fbff;
+  --bg-sec:      #f0f7ff;
+  --card-bg:     #ffffff;
+  --card-border: #e0efff;
+  --card-shadow: rgba(59, 130, 246, 0.06);
+
+  --input-border:      #b9daff;
+  --input-bg:          #f0f7ff;
+  --input-placeholder: #8ec2ff;
+  --input-focus:       #60a5fa;
+  --input-focus-ring:  rgba(96, 165, 250, 0.15);
+
+  --btn2-color:  #3b82f6;
+  --btn2-border: #b9daff;
+  --btn2-hover:  #f0f7ff;
+
+  --scroll-track: #f0f7ff;
+  --scroll-thumb: #b9daff;
+  --scroll-hover: #8ec2ff;
+
+  --text-main: #4a4a4a;
+  --text-sub:  #9ca3af;
+}
+
+/* ── 레몬(노랑) ── */
+html[data-theme="lemon"] {
+  --p50:  #fefce8;
+  --p100: #fef9c3;
+  --p200: #fef08a;
+  --p300: #fde047;
+  --p400: #facc15;
+  --p500: #ca8a04;
+
+  --bg:          #fffef5;
+  --bg-sec:      #fefce8;
+  --card-bg:     #ffffff;
+  --card-border: #fef9c3;
+  --card-shadow: rgba(202, 138, 4, 0.06);
+
+  --input-border:      #fef08a;
+  --input-bg:          #fefce8;
+  --input-placeholder: #d4b400;
+  --input-focus:       #facc15;
+  --input-focus-ring:  rgba(250, 204, 21, 0.15);
+
+  --btn2-color:  #ca8a04;
+  --btn2-border: #fef08a;
+  --btn2-hover:  #fefce8;
+
+  --scroll-track: #fefce8;
+  --scroll-thumb: #fef08a;
+  --scroll-hover: #fde047;
+
+  --text-main: #4a4a4a;
+  --text-sub:  #9ca3af;
+}
+
+/* ── 다크 모드 ── */
+html[data-theme="dark"] {
+  --p50:  #2a2a3d;
+  --p100: #322840;
+  --p200: #4a3050;
+  --p300: #c084a0;
+  --p400: #e879a0;
+  --p500: #f43f7e;
+
+  --bg:          #12121e;
+  --bg-sec:      #1a1a2e;
+  --card-bg:     #1e1e32;
+  --card-border: #2e2e4a;
+  --card-shadow: rgba(0, 0, 0, 0.4);
+
+  --input-border:      #3a3a5c;
+  --input-bg:          #252540;
+  --input-placeholder: #6060a0;
+  --input-focus:       #e879a0;
+  --input-focus-ring:  rgba(232, 121, 160, 0.2);
+
+  --btn2-color:  #e879a0;
+  --btn2-border: #3a3a5c;
+  --btn2-hover:  #252540;
+
+  --scroll-track: #1a1a2e;
+  --scroll-thumb: #3a3a5c;
+  --scroll-hover: #5a5a8c;
+
+  --text-main: #e2e8f0;
+  --text-sub:  #8888bb;
+}
+
+/* 다크 모드 텍스트/배경 오버라이드 */
+html[data-theme="dark"] body {
+  color: var(--text-main);
+}
+html[data-theme="dark"] .text-gray-600 { color: #d0d8e8 !important; }
+html[data-theme="dark"] .text-gray-500 { color: #b0b8cc !important; }
+html[data-theme="dark"] .text-gray-400 { color: #8890a8 !important; }
+html[data-theme="dark"] .text-gray-300 { color: #6870a0 !important; }
+html[data-theme="dark"] .bg-white { background-color: var(--card-bg) !important; }
+html[data-theme="dark"] .bg-white\/60 { background-color: rgba(30,30,50,0.6) !important; }
+html[data-theme="dark"] .bg-white\/40 { background-color: rgba(30,30,50,0.4) !important; }
+html[data-theme="dark"] .bg-gray-50 { background-color: #252540 !important; }
+html[data-theme="dark"] .border-gray-200 { border-color: #3a3a5c !important; }
+html[data-theme="dark"] .border-gray-100 { border-color: #2e2e4a !important; }
+
+/* ───────────────────────────────────────────
+   기본 스타일
+─────────────────────────────────────────── */
 * {
   margin: 0;
   padding: 0;
@@ -15,62 +267,56 @@ body {
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #fffdf7;
-  color: #4a4a4a;
+  background-color: var(--bg, #fffdf7);
+  color: var(--text-main, #4a4a4a);
 }
 
-/* 손글씨 느낌 제목 */
 .font-handwriting {
   font-family: 'Nanum Pen Script', cursive;
 }
 
-/* UI 텍스트 (프리텐다드) */
 .font-ui {
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* 부드러운 그림자 */
 .soft-shadow {
-  box-shadow: 0 2px 16px rgba(232, 104, 126, 0.1);
+  box-shadow: 0 2px 16px var(--card-shadow, rgba(232, 104, 126, 0.1));
 }
 
-/* 파스텔 카드 */
 .card-pastel {
-  background: white;
+  background: var(--card-bg, white);
   border-radius: 1.5rem;
-  box-shadow: 0 2px 16px rgba(232, 104, 126, 0.08);
-  border: 1px solid #fdeef0;
+  box-shadow: 0 2px 16px var(--card-shadow, rgba(232, 104, 126, 0.08));
+  border: 1px solid var(--card-border, #fdeef0);
 }
 
-/* 입력 필드 스타일 */
 .input-pastel {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1.5px solid #fbd5dc;
+  border: 1.5px solid var(--input-border, #fbd5dc);
   border-radius: 1rem;
-  background: #fef7f7;
+  background: var(--input-bg, #fef7f7);
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 0.95rem;
-  color: #4a4a4a;
+  color: var(--text-main, #4a4a4a);
   outline: none;
   transition: all 0.2s ease;
 }
 
 .input-pastel::placeholder {
-  color: #d4a0aa;
+  color: var(--input-placeholder, #d4a0aa);
 }
 
 .input-pastel:focus {
-  border-color: #f48da0;
-  box-shadow: 0 0 0 3px rgba(244, 141, 160, 0.15);
-  background: white;
+  border-color: var(--input-focus, #f48da0);
+  box-shadow: 0 0 0 3px var(--input-focus-ring, rgba(244, 141, 160, 0.15));
+  background: var(--card-bg, white);
 }
 
-/* 버튼 */
 .btn-primary {
   width: 100%;
   padding: 0.8rem;
-  background: linear-gradient(135deg, #f8b4c0, #8ec2ff);
+  background: linear-gradient(135deg, var(--p300, #f8b4c0), #8ec2ff);
   color: white;
   border: none;
   border-radius: 1rem;
@@ -83,15 +329,15 @@ body {
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(244, 141, 160, 0.3);
+  box-shadow: 0 4px 20px var(--input-focus-ring, rgba(244, 141, 160, 0.3));
 }
 
 .btn-secondary {
   width: 100%;
   padding: 0.8rem;
-  background: white;
-  color: #e8687e;
-  border: 1.5px solid #fbd5dc;
+  background: var(--card-bg, white);
+  color: var(--btn2-color, #e8687e);
+  border: 1.5px solid var(--btn2-border, #fbd5dc);
   border-radius: 1rem;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 1rem;
@@ -100,26 +346,25 @@ body {
 }
 
 .btn-secondary:hover {
-  background: #fef7f7;
-  border-color: #f48da0;
+  background: var(--btn2-hover, #fef7f7);
+  border-color: var(--input-focus, #f48da0);
 }
 
-/* 스크롤바 커스텀 */
 ::-webkit-scrollbar {
   width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #fef7f7;
+  background: var(--scroll-track, #fef7f7);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #fbd5dc;
+  background: var(--scroll-thumb, #fbd5dc);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #f8b4c0;
+  background: var(--scroll-hover, #f8b4c0);
 }
 
 @keyframes modalIn {
