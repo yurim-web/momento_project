@@ -9,10 +9,12 @@ export default function SignupPage() {
   const router = useRouter()
   const [form, setForm] = useState({
     name: '',
+    nickname: '',
     email: '',
     password: '',
     passwordConfirm: '',
     phone: '',
+    birthday: '',
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -42,8 +44,29 @@ export default function SignupPage() {
       return
     }
 
-    users.push({ email: form.email, password: form.password, name: form.name, phone: form.phone })
+    users.push({
+      email: form.email,
+      password: form.password,
+      name: form.name,
+      nickname: form.nickname,
+      phone: form.phone,
+      birthday: form.birthday,
+    })
     localStorage.setItem('momento_users', JSON.stringify(users))
+
+    // 생일을 캘린더에 기념일로 저장
+    if (form.birthday) {
+      const calendar = JSON.parse(localStorage.getItem('momento_calendar') || '[]')
+      const displayName = form.nickname || form.name
+      calendar.push({
+        id: Date.now(),
+        date: form.birthday,
+        title: `🎂 ${displayName}의 생일`,
+        category: 'birthday',
+      })
+      localStorage.setItem('momento_calendar', JSON.stringify(calendar))
+    }
+
     setShowSuccess(true)
   }
 
@@ -71,16 +94,44 @@ export default function SignupPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm text-pink-400 mb-1.5 ml-1">이름</label>
+                <input
+                  type="text"
+                  name="name"
+                  className="input-pastel"
+                  placeholder="실명"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-pink-400 mb-1.5 ml-1">
+                  애칭 <span className="text-gray-300 text-xs">(선택)</span>
+                </label>
+                <input
+                  type="text"
+                  name="nickname"
+                  className="input-pastel"
+                  placeholder="별명"
+                  value={form.nickname}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
             <div>
-              <label className="block text-sm text-pink-400 mb-1.5 ml-1">이름</label>
+              <label className="block text-sm text-pink-400 mb-1.5 ml-1">
+                생년월일 <span className="text-gray-300 text-xs">(선택 · 캘린더에 생일 등록)</span>
+              </label>
               <input
-                type="text"
-                name="name"
+                type="date"
+                name="birthday"
                 className="input-pastel"
-                placeholder="이름을 알려주세요"
-                value={form.name}
+                value={form.birthday}
                 onChange={handleChange}
-                required
               />
             </div>
 
@@ -143,13 +194,21 @@ export default function SignupPage() {
             </div>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-3">
             <p className="text-sm text-gray-400">
               이미 계정이 있나요?{' '}
               <Link href="/login" className="text-pink-400 hover:text-pink-500 font-bold">
                 로그인
               </Link>
             </p>
+            <div className="border-t border-pink-50 pt-3">
+              <Link
+                href="/about"
+                className="font-ui text-xs text-lavender-400 hover:text-lavender-500 transition-colors"
+              >
+                🌸 Momento가 처음이라면? 앱 소개 보기
+              </Link>
+            </div>
           </div>
         </div>
       </div>
