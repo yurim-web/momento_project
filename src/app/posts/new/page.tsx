@@ -1,15 +1,21 @@
 'use client'
 
 import Navbar from '@/components/Navbar'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
 
-const categories = ['데이트', '여행', '기념일', '일상', '맛집']
+const DEFAULT_CATEGORIES = ['데이트', '여행', '기념일', '일상', '맛집']
 
 export default function NewPostPage() {
   const router = useRouter()
   const { isLoggedIn, loading: authLoading } = useAuth()
+  const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES)
+
+  useEffect(() => {
+    const custom: string[] = JSON.parse(localStorage.getItem('momento_custom_categories') || '[]')
+    setCategories([...DEFAULT_CATEGORIES, ...custom])
+  }, [])
   const [form, setForm] = useState({
     title: '',
     content: '',

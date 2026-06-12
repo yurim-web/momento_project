@@ -26,7 +26,7 @@ interface MemoComment {
   createdAt: string
 }
 
-const postCategories = ['전체', '데이트', '여행', '기념일', '일상', '맛집']
+const DEFAULT_CATEGORIES = ['데이트', '여행', '기념일', '일상', '맛집']
 
 const memoColors: { key: MemoData['color']; bg: string; border: string; dot: string; selected: string }[] = [
   { key: 'pink',     bg: 'bg-pink-50',     border: 'border-pink-200',     dot: 'bg-pink-300',     selected: 'border-pink-400' },
@@ -57,6 +57,10 @@ export default function PostsPage() {
   // 게시글
   const [selectedCategory, setSelectedCategory] = useState('전체')
   const [posts, setPosts] = useState<PostData[]>([])
+  const [customCategories, setCustomCategories] = useState<string[]>([])
+  const [showAddCat, setShowAddCat] = useState(false)
+  const [newCatName, setNewCatName] = useState('')
+  const allCategories = ['전체', ...DEFAULT_CATEGORIES, ...customCategories]
 
   // 메모
   const [memos, setMemos] = useState<MemoData[]>([])
@@ -77,7 +81,25 @@ export default function PostsPage() {
 
   useEffect(() => {
     setMemos(JSON.parse(localStorage.getItem('momento_memos') || '[]'))
+    setCustomCategories(JSON.parse(localStorage.getItem('momento_custom_categories') || '[]'))
   }, [])
+
+  const handleAddCategory = () => {
+    const name = newCatName.trim()
+    if (!name || allCategories.includes(name)) return
+    const updated = [...customCategories, name]
+    setCustomCategories(updated)
+    localStorage.setItem('momento_custom_categories', JSON.stringify(updated))
+    setNewCatName('')
+    setShowAddCat(false)
+  }
+
+  const handleDeleteCategory = (cat: string) => {
+    const updated = customCategories.filter(c => c !== cat)
+    setCustomCategories(updated)
+    localStorage.setItem('momento_custom_categories', JSON.stringify(updated))
+    if (selectedCategory === cat) setSelectedCategory('전체')
+  }
 
   const saveMemos = (updated: MemoData[]) => {
     setMemos(updated)
@@ -178,7 +200,7 @@ export default function PostsPage() {
 
         {/* 탭 */}
         <div className="flex gap-2 mb-6">
-          {([['posts', '📝 게시글'], ['memo', '🗒️ 메모']] as const).map(([key, label]) => (
+          {([['posts', '✍️ 게시글'], ['memo', '🌙 메모']] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setTab(key)}
@@ -197,24 +219,56 @@ export default function PostsPage() {
         {tab === 'posts' && (
           <>
             <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-              {postCategories.map((cat) => (
+              {allCategories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-ui whitespace-nowrap transition-all ${
+                  className={`flex items-center gap-1 px-4 py-1.5 rounded-full text-sm font-ui whitespace-nowrap transition-all ${
                     selectedCategory === cat
                       ? 'bg-pink-300 text-white'
                       : 'bg-white text-gray-400 border border-pink-100 hover:border-pink-300'
                   }`}
                 >
                   {cat}
+                  {customCategories.includes(cat) && (
+                    <span
+                      onClick={(e) => { e.stopPropagation(); handleDeleteCategory(cat) }}
+                      className="ml-0.5 leading-none hover:text-red-300"
+                    >
+                      ×
+                    </span>
+                  )}
                 </button>
               ))}
+
+              {/* 카테고리 추가 */}
+              {showAddCat ? (
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <input
+                    autoFocus
+                    type="text"
+                    value={newCatName}
+                    onChange={e => setNewCatName(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleAddCategory(); if (e.key === 'Escape') { setShowAddCat(false); setNewCatName('') } }}
+                    placeholder="카테고리명"
+                    className="w-24 px-2 py-1 text-xs font-ui border border-pink-200 rounded-full outline-none focus:border-pink-300 bg-white"
+                  />
+                  <button onClick={handleAddCategory} className="text-xs text-pink-400 hover:text-pink-500 font-ui">확인</button>
+                  <button onClick={() => { setShowAddCat(false); setNewCatName('') }} className="text-xs text-gray-300 hover:text-gray-400 font-ui">✕</button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAddCat(true)}
+                  className="px-3 py-1.5 rounded-full text-sm font-ui whitespace-nowrap bg-white text-pink-300 border border-pink-100 hover:border-pink-300 flex-shrink-0"
+                >
+                  +
+                </button>
+              )}
             </div>
 
             {posts.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-3xl mb-2">✏️</p>
+                <p className="text-3xl mb-2">✍️</p>
                 <p className="text-gray-400">아직 이야기가 없어요</p>
                 <Link href="/posts/new" className="text-sm text-pink-400 hover:text-pink-500 mt-2 inline-block">
                   첫 번째 이야기를 작성해보세요
@@ -250,7 +304,7 @@ export default function PostsPage() {
           <>
             {memos.length === 0 ? (
               <div className="card-pastel p-12 text-center">
-                <span className="text-5xl block mb-4">🗒️</span>
+                <span className="text-5xl block mb-4">🌙</span>
                 <p className="font-ui text-gray-400 text-sm mb-3">아직 메모가 없어요</p>
                 <button onClick={openAddMemo} className="font-ui text-sm text-pink-400 hover:text-pink-500">
                   맛집, 할 말, 기억할 것들을 메모해보세요 →
