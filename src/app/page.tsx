@@ -37,6 +37,47 @@ const formatDateTime = (dateStr?: string) => {
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
+const DAILY_QUOTES = [
+  '오늘도 네 옆에 있어서 행복해 🌸',
+  '같이 있으면 모든 순간이 특별해져 ✨',
+  '너랑 함께라면 평범한 하루도 소중해 💌',
+  '오늘 하루도 수고했어, 잘 버텨줘서 고마워 🌿',
+  '네가 있어서 내 세상이 더 따뜻해 🌷',
+  '같이 밥 먹는 것도 다 추억이 되는 것 같아 🍚',
+  '오늘도 내 곁에 있어줘서 고마워 🫧',
+  '너의 웃음이 오늘 하루를 버티게 해줬어 🌙',
+  '우리가 함께한 모든 순간을 기억하고 싶어 📔',
+  '네 생각 하면 저절로 웃음이 나와 🌸',
+  '오늘도 잘 자, 좋은 꿈 꿔 🌙',
+  '함께라서 든든해, 고마워 💕',
+  '어떤 하루였어도 너랑 끝내면 괜찮아 🍃',
+  '보고 싶다 이 말이 항상 맴돌아 🫶',
+  '오늘도 건강하게, 밥 잘 챙겨 먹어 🌿',
+  '네 손 잡으면 다 괜찮아지는 것 같아 🌷',
+  '우리 앞으로도 이렇게 오래오래 함께하자 ✨',
+  '오늘 하루 중 네가 제일 좋은 부분이었어 💌',
+  '작은 것도 함께하면 특별해지잖아 🌸',
+  '네가 웃을 때가 제일 예뻐 🌙',
+  '오늘도 나한테 와줘서 고마워 🫧',
+  '같이 늙어가는 것도 설레는 일이야 🌿',
+  '너랑 있으면 시간 가는 게 아쉬워 💕',
+  '힘든 날도 네가 있으면 버틸 수 있어 🍃',
+  '오늘도 사랑해, 내일도 사랑할 거야 🌷',
+  '네 목소리 듣고 싶다 🌸',
+  '우리 오늘 뭐 먹을까? 같이 먹으면 다 맛있어 🍀',
+  '세상에서 제일 좋아하는 사람이야 ✨',
+  '네가 행복하면 나도 행복해 💌',
+  '오늘 하루도 고생했어, 이제 푹 쉬어 🌙',
+]
+
+const getDailyQuote = () => {
+  const now = new Date()
+  const dayIndex = Math.floor(
+    (now.getFullYear() * 366 + Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000))
+  ) % DAILY_QUOTES.length
+  return DAILY_QUOTES[dayIndex]
+}
+
 export default function Home() {
   const [recentPosts, setRecentPosts] = useState<PostData[]>([])
   const [loading, setLoading] = useState(true)
@@ -48,22 +89,21 @@ export default function Home() {
     person1: '나',
     person2: '당신',
     startDate: '2024-01-15',
-    todayMessage: '오늘도 사랑해 ♡',
   })
   const [myPhoto, setMyPhoto] = useState<string | null>(null)
   const [partnerPhoto, setPartnerPhoto] = useState<string | null>(null)
+
+  const dailyQuote = getDailyQuote()
 
   useEffect(() => {
     const savedStartDate = localStorage.getItem('coupleStartDate')
     const savedPerson1 = localStorage.getItem('userName') || '나'
     const savedPerson2 = localStorage.getItem('partnerName') || '당신'
-    const savedMessage = localStorage.getItem('todayMessage')
     setCoupleData(prev => ({
       ...prev,
       person1: savedPerson1,
       person2: savedPerson2,
       startDate: savedStartDate || prev.startDate,
-      todayMessage: savedMessage || prev.todayMessage,
     }))
 
     setMyPhoto(localStorage.getItem('myProfilePhoto'))
@@ -161,14 +201,14 @@ export default function Home() {
               <p className="font-ui text-sm font-bold text-lavender-400 mb-3">오늘의 한마디 ✨</p>
               <div className="flex-1 flex items-center justify-center">
                 <p className="font-handwriting text-lg text-gray-600 text-center leading-relaxed">
-                  &ldquo;{coupleData.todayMessage}&rdquo;
+                  &ldquo;{dailyQuote}&rdquo;
                 </p>
               </div>
             </section>
 
             {/* 오늘 일정 */}
             <section className="card-pastel p-5 flex-1 flex flex-col">
-              <p className="font-ui text-sm font-bold text-pink-400 mb-3">오늘 일정 📅</p>
+              <p className="font-ui text-sm font-bold text-pink-400 mb-3">오늘 일정 🗓️</p>
               {(() => {
                 const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
                 const todayEvents = calendarEvents.filter(e => e.date === todayStr)
@@ -238,7 +278,7 @@ export default function Home() {
         {memos.length > 0 && (
           <section className="mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-handwriting text-2xl text-gray-600">메모 🗒️</h2>
+              <h2 className="font-handwriting text-2xl text-gray-600">메모 🌙</h2>
               <Link href="/posts" className="text-sm text-pink-400 hover:text-pink-500 font-ui">더보기</Link>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -270,10 +310,10 @@ export default function Home() {
         {/* 빠른 메뉴 */}
         <section className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           {[
-            { href: '/posts/new', icon: '✏️', label: '글쓰기' },
-            { href: '/diary/write', icon: '📖', label: '일기' },
-            { href: '/calendar', icon: '📅', label: '캘린더' },
-            { href: '/anniversary', icon: '💝', label: '기념일' },
+            { href: '/posts/new', icon: '✍️', label: '글쓰기' },
+            { href: '/diary/write', icon: '🌸', label: '일기' },
+            { href: '/calendar', icon: '🗓️', label: '캘린더' },
+            { href: '/anniversary', icon: '💌', label: '기념일' },
           ].map((item) => (
             <Link key={item.href} href={item.href} className="card-pastel p-4 text-center hover:scale-105 transition-transform">
               <span className="text-2xl block mb-1">{item.icon}</span>
@@ -304,10 +344,7 @@ export default function Home() {
                         </span>
                         <span className="text-sm text-gray-600">{post.title}</span>
                       </div>
-                      <div className="text-right">
-                        <p className="text-xs text-gray-400">{formatDate(post.createdAt)}</p>
-                        <p className="text-xs text-lavender-400">{post.authorName}</p>
-                      </div>
+                      <p className="text-xs text-gray-400 flex-shrink-0">{formatDate(post.createdAt)}</p>
                     </div>
                   </div>
                 </Link>

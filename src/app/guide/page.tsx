@@ -4,51 +4,55 @@ import Link from 'next/link'
 
 const steps = [
   {
-    emoji: '💑',
+    emoji: '🌿',
     title: '회원가입 & 커플 연결',
-    desc: '각자 회원가입 후, 초대코드를 공유하여 커플로 연결해요.',
+    desc: '각자 회원가입 후, 초대코드를 공유해 커플로 연결해요.',
   },
   {
-    emoji: '✏️',
-    title: '우리의 이야기 작성',
-    desc: '데이트, 여행, 기념일 등 둘만의 추억을 게시글로 남겨요.',
+    emoji: '✍️',
+    title: '게시글 & 메모',
+    desc: '데이트, 여행, 기념일 등 추억을 게시글로 남기고, 메모 탭에서 맛집·할 말·기억할 것들을 스티커 노트처럼 저장해요. 메모에 댓글도 달 수 있어요.',
   },
   {
-    emoji: '📖',
+    emoji: '🌸',
     title: '일기장',
-    desc: '오늘의 기분과 하루를 기록하고, 상대방과 공유할 수 있어요.',
+    desc: '하루에 한 번, 오늘의 기분과 속상했던 일·특별했던 일·행복했던 일을 섹션별로 기록해요. 상대방과 공유하거나 나만 볼 수 있어요.',
   },
   {
-    emoji: '📅',
+    emoji: '🗓️',
     title: '캘린더',
     desc: '데이트 일정, 기념일, 생일 등을 함께 관리해요.',
   },
   {
-    emoji: '🖼',
+    emoji: '🌷',
     title: '갤러리',
     desc: '둘만의 사진을 모아 예쁜 갤러리를 만들어요.',
   },
   {
-    emoji: '✈️',
-    title: '여행 계획',
-    desc: '일별 여행 일정을 세우고, 주소를 넣으면 네이버 지도로 바로 연결돼요.',
+    emoji: '🗺️',
+    title: '여행 계획 & 버킷리스트',
+    desc: '일별 여행 일정을 세우고 주소를 넣으면 네이버 지도로 연결돼요. 버킷리스트 탭에서 가고 싶은 맛집·카페·장소를 카테고리별로 저장하고 완료 체크도 할 수 있어요.',
   },
   {
-    emoji: '💬',
+    emoji: '🫧',
     title: '둘만의 채팅',
     desc: '비밀 채팅으로 언제든 달콤한 대화를 나눠요.',
   },
   {
-    emoji: '💝',
+    emoji: '💌',
     title: '기념일 & D-Day',
     desc: '사귄 날부터 자동 계산! 다가오는 기념일도 한눈에 확인해요.',
+  },
+  {
+    emoji: '🌙',
+    title: '프로필 & 사진',
+    desc: '프로필 사진을 업로드하면 홈 화면과 프로필에 바로 적용돼요.',
   },
 ]
 
 export default function GuidePage() {
   return (
     <div className="min-h-screen bg-cream-50 relative overflow-hidden">
-      {/* 배경 장식 */}
       <div className="absolute top-20 left-10 w-40 h-40 bg-pink-100 rounded-full blur-3xl opacity-50" />
       <div className="absolute bottom-40 right-10 w-48 h-48 bg-lavender-100 rounded-full blur-3xl opacity-50" />
       <div className="absolute top-1/2 right-20 w-32 h-32 bg-mint-100 rounded-full blur-3xl opacity-30" />
@@ -63,7 +67,7 @@ export default function GuidePage() {
 
         {/* 소개 카드 */}
         <div className="card-pastel p-6 mb-8 text-center">
-          <p className="text-4xl mb-3">♥</p>
+          <p className="text-4xl mb-3">🌸</p>
           <p className="text-gray-600 leading-relaxed">
             <span className="font-handwriting text-lg">Momento</span>
             <span className="font-ui text-sm">는 연인과 함께 쓰는 프라이빗 블로그예요.</span>
@@ -93,16 +97,16 @@ export default function GuidePage() {
           ))}
         </div>
 
-        {/* 시작하기 */}
+        {/* 버튼 */}
         <div className="text-center space-y-3">
-          <Link href="/signup" className="btn-primary block py-3 text-center">
-            시작하기
+          <Link href="/" className="btn-primary block py-3 text-center">
+            홈으로 가기
           </Link>
-          <Link href="/login" className="btn-secondary block py-3 text-center">
-            이미 계정이 있어요
+          <Link href="/profile" className="btn-secondary block py-3 text-center">
+            프로필로 돌아가기
           </Link>
           <p className="font-handwriting text-sm text-lavender-300 mt-6">
-            사랑하는 사람과 함께, Momento ♡
+            사랑하는 사람과 함께, Momento 🌸
           </p>
         </div>
       </div>

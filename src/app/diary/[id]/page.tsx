@@ -47,10 +47,10 @@ export default function DiaryDetailPage() {
   if (!diary) return <div className="min-h-screen bg-cream-50"><Navbar /><p className="text-center py-12 text-gray-400">일기를 찾을 수 없습니다.</p></div>
 
   const sections = [
-    { label: '😢 속상하거나 우울했던 일', content: diary.sadContent, color: '#e8687e' },
+    { label: '🌧️ 속상하거나 우울했던 일', content: diary.sadContent, color: '#e8687e' },
     { label: '✨ 오늘 특별했던 일', content: diary.specialContent, color: '#8ec2ff' },
     { label: '🌸 오늘 행복했던 일', content: diary.happyContent, color: '#f48da0' },
-    { label: '📝 기타', content: diary.etcContent, color: '#a0a0a0' },
+    { label: '🍃 기타', content: diary.etcContent, color: '#a0a0a0' },
   ]
 
   return (
@@ -69,7 +69,7 @@ export default function DiaryDetailPage() {
             <p className="font-handwriting text-2xl text-gray-600">{formatDate(diary.diaryDate)}</p>
             <div className="flex items-center justify-center gap-3 mt-3 text-xs text-gray-400 font-ui">
               <span>by {diary.authorName}</span>
-              <span>{diary.isShared ? '💑 공유됨' : '🔒 나만 보기'}</span>
+              <span>{diary.isShared ? '🌸 공유됨' : '🌙 나만 보기'}</span>
             </div>
           </div>
 

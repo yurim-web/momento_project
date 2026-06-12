@@ -201,7 +201,7 @@ export default function TravelPage() {
 
         {/* 탭 */}
         <div className="flex gap-2 mb-6">
-          {([['plan', '✈️ 여행 계획'], ['bucket', '🗺️ 버킷리스트']] as const).map(([key, label]) => (
+          {([['plan', '🗺️ 여행 계획'], ['bucket', '🌿 버킷리스트']] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => { setTab(key); setSelectedPlan(null) }}
@@ -320,7 +320,7 @@ export default function TravelPage() {
                 </div>
                 {plans.length === 0 ? (
                   <div className="card-pastel p-12 text-center">
-                    <span className="text-5xl block mb-4">✈️</span>
+                    <span className="text-5xl block mb-4">🌿</span>
                     <p className="font-ui text-gray-400 text-sm mb-3">아직 여행 계획이 없어요</p>
                     <button onClick={() => setShowNewPlan(true)} className="font-ui text-sm text-pink-400 hover:text-pink-500">첫 번째 여행을 계획해보세요 →</button>
                   </div>
@@ -378,7 +378,7 @@ export default function TravelPage() {
 
             {filteredBuckets.length === 0 ? (
               <div className="card-pastel p-12 text-center">
-                <span className="text-5xl block mb-4">🗺️</span>
+                <span className="text-5xl block mb-4">🌿</span>
                 <p className="font-ui text-gray-400 text-sm mb-3">
                   {bucketFilter === '전체' ? '아직 버킷리스트가 없어요' : `${bucketFilter} 항목이 없어요`}
                 </p>

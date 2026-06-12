@@ -72,7 +72,7 @@ export default function DiaryWritePage() {
         <Navbar />
         <main className="max-w-2xl mx-auto px-4 py-8 pb-24 md:pb-8">
           <div className="card-pastel p-12 text-center">
-            <p className="text-5xl mb-4">📖</p>
+            <p className="text-5xl mb-4">🌸</p>
             <h2 className="font-handwriting text-2xl text-gray-600 mb-2">오늘 일기는 이미 썼어요!</h2>
             <p className="font-ui text-sm text-gray-400 mb-6">일기는 하루에 한 번만 쓸 수 있어요</p>
             <button onClick={() => router.push('/diary')} className="btn-primary !w-auto px-8">
@@ -113,7 +113,7 @@ export default function DiaryWritePage() {
           {/* 속상했던 일 */}
           <div className="card-pastel p-5">
             <label className="block text-sm mb-2 font-ui font-bold" style={{ color: '#e8687e' }}>
-              😢 속상하거나 우울했던 일
+              🌧️ 속상하거나 우울했던 일
             </label>
             <textarea
               className="input-pastel min-h-[100px] resize-y"
@@ -152,7 +152,7 @@ export default function DiaryWritePage() {
           {/* 기타 */}
           <div className="card-pastel p-5">
             <label className="block text-sm text-gray-400 mb-2 font-ui font-bold">
-              📝 기타
+              🍃 기타
             </label>
             <textarea
               className="input-pastel min-h-[100px] resize-y"
@@ -169,7 +169,7 @@ export default function DiaryWritePage() {
               <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${form.isShared ? 'left-6' : 'left-0.5'}`} />
             </button>
             <span className="text-sm text-gray-500 font-ui">
-              {form.isShared ? '💑 상대방과 공유' : '🔒 나만 보기'}
+              {form.isShared ? '🌸 상대방과 공유' : '🌙 나만 보기'}
             </span>
           </div>
 

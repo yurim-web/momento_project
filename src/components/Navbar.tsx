@@ -5,14 +5,14 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
 const navItems = [
-  { href: '/', label: '홈', icon: '🏠' },
-  { href: '/posts', label: '게시글', icon: '✏️' },
-  { href: '/diary', label: '일기장', icon: '📖' },
-  { href: '/calendar', label: '캘린더', icon: '📅' },
-  { href: '/gallery', label: '갤러리', icon: '🖼' },
-  { href: '/travel', label: '여행', icon: '✈️' },
-  { href: '/chat', label: '채팅', icon: '💬' },
-  { href: '/profile', label: '프로필', icon: '♡' },
+  { href: '/', label: '홈', icon: '🌿' },
+  { href: '/posts', label: '게시글', icon: '✍️' },
+  { href: '/diary', label: '일기장', icon: '🌸' },
+  { href: '/calendar', label: '캘린더', icon: '🗓️' },
+  { href: '/gallery', label: '갤러리', icon: '🌷' },
+  { href: '/travel', label: '여행', icon: '🗺️' },
+  { href: '/chat', label: '채팅', icon: '🫧' },
+  { href: '/profile', label: '프로필', icon: '🌙' },
 ]
 
 export default function Navbar() {

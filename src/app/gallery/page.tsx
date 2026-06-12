@@ -102,7 +102,7 @@ export default function GalleryPage() {
           </div>
         ) : (
           <div className="card-pastel p-12 text-center">
-            <span className="text-5xl block mb-4">📷</span>
+            <span className="text-5xl block mb-4">🌷</span>
             <p className="font-ui text-gray-400 text-sm mb-3">아직 사진이 없어요</p>
             <button onClick={() => setShowUpload(true)} className="font-ui text-sm text-pink-400 hover:text-pink-500">
               첫 번째 사진 올리기 →
@@ -139,7 +139,7 @@ export default function GalleryPage() {
               ) : (
                 <button onClick={() => fileRef.current?.click()}
                   className="w-full border-2 border-dashed border-pink-200 rounded-2xl p-8 text-center hover:border-pink-300 transition-colors mb-4">
-                  <p className="text-3xl mb-2">📷</p>
+                  <p className="text-3xl mb-2">🌷</p>
                   <p className="font-ui text-sm text-gray-400">클릭해서 사진 선택</p>
                 </button>
               )}

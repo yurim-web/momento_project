@@ -74,7 +74,7 @@ export default function DiaryPage() {
 
         {diaries.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-3xl mb-2">📖</p>
+            <p className="text-3xl mb-2">🌸</p>
             <p className="text-gray-400 font-ui">아직 일기가 없어요</p>
             <Link href="/diary/write" className="text-sm text-lavender-400 hover:text-lavender-500 mt-2 inline-block font-ui">
               오늘의 일기를 작성해보세요
